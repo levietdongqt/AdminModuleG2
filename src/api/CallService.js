@@ -66,30 +66,5 @@ export async function RegisterService(RegisterRequestDTO){
     }
 };
 
-// export async function GetAllWalk(page,dataPerPage,filterOn,filterQuery,sortBy,isAscending){
-//     let response;
-//     try{       
-//         if(filterOn === '' && filterQuery === ''){
-//             if(sortBy === '' && isAscending === true){
-//                 response = await GetAllWalkAsync(page,dataPerPage,null,null,'name',true);
-//             }else{
-//                 response = await GetAllWalkAsync(page,dataPerPage,null,null,sortBy,isAscending);
-//             }          
-//         }else{
-//             if(sortBy === '' && isAscending === true){
-//                 response = await GetAllWalkAsync(page,dataPerPage,filterOn,filterQuery,"name",true);
-//             }else{
-//                 response = await GetAllWalkAsync(page,dataPerPage,filterOn,filterQuery,sortBy,isAscending);
-//             }          
-//         }       
-//         return response;
-//     }catch(error){
-//         return AxiosError.ERR_BAD_REQUEST;
-//     }
-// }
 
-const GetAllWalkAsync = async (page,dataPerPage,filterOn,filterQuery,sortBy,isAscending)=> {
-    const response = await apiClient.get(`/api/Walk?filterOn=${filterOn}&filterQuery=${filterQuery}&sortBy=${sortBy}&isAscending=${isAscending}&pageNumber=${page}&pageSize=${dataPerPage}`)
-    return response;
-}
 

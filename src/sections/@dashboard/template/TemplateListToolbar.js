@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
+import { useState,useEffect } from 'react';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment } from '@mui/material';
+import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment,Popover,MenuItem,Button } from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
 
@@ -32,14 +33,25 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-UserListToolbar.propTypes = {
+TemplateListToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
+  onDeleteAll: PropTypes.func,
 };
 
-export default function UserListToolbar({ numSelected, filterName, onFilterName }) {
+export default function TemplateListToolbar({ numSelected, filterName, onFilterName,onDeleteAll }) {
+  const [open, setOpen] = useState(null);
+  const handleOpenMenu = (event) => {
+    setOpen(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setOpen(null);
+  };
+
+  
   return (
+    <>
     <StyledRoot
       sx={{
         ...(numSelected > 0 && {
@@ -56,7 +68,7 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         <StyledSearch
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search user..."
+          placeholder="Search Template..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
@@ -67,17 +79,52 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={onDeleteAll}>
             <Iconify icon="eva:trash-2-fill" />
           </IconButton>
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
             <Iconify icon="ic:round-filter-list" />
           </IconButton>
-        </Tooltip>
+        </Tooltip>       
       )}
     </StyledRoot>
+    <Popover
+    open={Boolean(open)}
+    anchorEl={open}
+    onClose={handleCloseMenu}
+    anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    PaperProps={{
+      sx: {
+        p: 1,
+        width: 200,
+        height:400,
+        opacity:1,
+        '& .MuiMenuItem-root': {
+          px: 1,
+          typography: 'body2',
+          borderRadius: 0.75,
+        },
+      },
+    }}
+  >
+    <MenuItem>
+      <Iconify icon={'eva:edit-fill'}/>
+      <Button variant="contained">
+       PricePlus
+      </Button>
+    </MenuItem>
+
+    <MenuItem sx={{ color: 'error.main' }}>
+      <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+      <Button variant="contained">
+        Create Date
+      </Button>
+    </MenuItem>
+  </Popover>
+  </>
   );
 }
