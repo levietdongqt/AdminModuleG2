@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
+import { filter, template } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
 
@@ -33,9 +33,9 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { TemplateListHead, TemplateListToolbar } from '../sections/@dashboard/template';
+import { TemplateListHead, TemplateListToolbar, TemplateDetails,EditTemplate } from '../sections/@dashboard/template';
 
-import { GetAllTemplate,DeleteTemplate,DeleteAllTemplate } from '../api/TemplateService/TemplateService';
+import { GetAllTemplate, DeleteTemplate, DeleteAllTemplate, GetTemplateById } from '../api/TemplateService';
 
 import { fDateTime } from '../utils/formatTime';
 
@@ -95,7 +95,8 @@ function applySortFilter(array, comparator, query) {
 
 export default function TemplateForAdminPage() {
   const [open, setOpen] = useState(null);
-
+  const [openDialog, setOpenDiaLog] = useState(false);
+  const [openDialogEdit,setOpenDialogEdit] = useState(false);
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -110,6 +111,8 @@ export default function TemplateForAdminPage() {
 
   const [Template, setTemplate] = useState([]);
 
+  const [templateId, setTemplateId] = useState({});
+
   const [dataPerPage, setDataPerPage] = useState(1000);
 
   const [filterOn, setFilterOn] = useState('');
@@ -123,7 +126,6 @@ export default function TemplateForAdminPage() {
     GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery, sortBy, isAscending);
   }, [filterQuery, sortBy, isAscending]);
 
-
   const GetAllTemplateAsync = async (page, dataPerPage, filterOn, filterQuery, sortBy, isAscending) => {
     const response = await GetAllTemplate(page, dataPerPage, filterOn, filterQuery, sortBy, isAscending);
 
@@ -134,7 +136,6 @@ export default function TemplateForAdminPage() {
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
-    
   };
 
   const handleCloseMenu = () => {
@@ -154,17 +155,15 @@ export default function TemplateForAdminPage() {
     if (event.target.checked) {
       const newSelecteds = Template.map((n) => n.id);
       setSelected(newSelecteds);
-      
-    }else{
+    } else {
       setSelected([]);
     }
-    console.log(selected)
-    
+    console.log(selected);
   };
 
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
-   
+
     let newSelected = [];
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, name);
@@ -194,21 +193,38 @@ export default function TemplateForAdminPage() {
     setFilterQuery(event.target.value);
   };
 
-
-  const handleRowClick = (id) =>{
+  const handleRowClick = (id) => {
     setIdSelected(id);
-  }
+  };
 
   const handleDelete = async (id) => {
     const response = await DeleteTemplate(id);
     console.log(response);
   };
 
-  const handleDeleteAll = async () =>{
+  const handleDeleteAll = async () => {
     const response = await DeleteAllTemplate(selected);
     console.log(response);
+  };
+
+  const handleClickDialog = async (id) => {
+    const response = await GetTemplateById(id);
+    setTemplateId(response.data.result);
+    setOpenDiaLog(true);
+  };
+  const handleCloseDialog = () => {
+    setOpenDiaLog(false);
+  };
+
+  const handleClickEditDialog = async (id) => {
+    const response = await GetTemplateById(id);
+    setTemplateId(response.data.result);
+    console.log(templateId);
+    setOpenDialogEdit(true);
   }
-  
+  const handleCloseDialogEdit = () => {
+    setOpenDialogEdit(false);
+  }
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - Template.length) : 0;
   console.log(emptyRows);
@@ -220,16 +236,16 @@ export default function TemplateForAdminPage() {
   return (
     <>
       <Helmet>
-        <title> Product | Product UI </title>
+        <title> Template</title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Product
+          <Typography variant="h4" gutterBottom color={'Highlight'}>
+            TEMPLATE
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} href="/dashboard/create">
-            New Product
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} href="template/create" color="info">
+            NEW TEMPLATE
           </Button>
         </Stack>
 
@@ -258,7 +274,7 @@ export default function TemplateForAdminPage() {
                     const selectedUser = selected.indexOf(row.id) !== -1;
                     return (
                       <TableRow hover key={row.id} tabIndex={-1} role="checkbox" onClick={() => handleRowClick(row.id)}>
-                        <TableCell padding="checkbox" >
+                        <TableCell padding="checkbox">
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
                         </TableCell>
                         <TableCell align="left">{row.name}</TableCell>
@@ -273,18 +289,25 @@ export default function TemplateForAdminPage() {
                                     width: 200,
                                     maxHeight: { xs: 233, md: 167 },
                                     maxWidth: { xs: 350, md: 250 },
+                                    border: '0.5px thin #000', // Thêm khung đen 2px
+                                    borderRadius: 1, // Bo tròn góc 8px
+                                    transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
+                                    '&:hover': {
+                                      transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
+                                      boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
+                                    },
                                   }}
                                   alt={`Image ${index}`}
-                                  src={image.imageUrl}
+                                  src={`https://localhost:5000${image.imageUrl}`}
                                   style={imageStyle}
                                 />
                               </div>
                             ))}
                           </Slider>
                         </TableCell>
-                        <TableCell align="left">{row.pricePlus}</TableCell>
+                        <TableCell align="left">{row.pricePlusPerOne}</TableCell>
 
-                        <TableCell align="left">{row.quantityPlus}</TableCell>
+                        <TableCell align="left">{row.quantityPlus || 0}</TableCell>
                         <TableCell align="left">{fDateTime(row.createDate)}</TableCell>
 
                         <TableCell align="left">
@@ -294,7 +317,7 @@ export default function TemplateForAdminPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={ handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -367,46 +390,25 @@ export default function TemplateForAdminPage() {
       >
         <MenuItem>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button variant="contained" href="/dashboard/user">
+          <Button variant="contained" onClick={() => handleClickDialog(idSelected)}>
+            Details
+          </Button>
+        </MenuItem>
+        <MenuItem>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+          <Button variant="contained" onClick={()=> handleClickEditDialog(idSelected)}>
             Edit Template
           </Button>
         </MenuItem>
-
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
           <Button variant="contained" onClick={() => handleDelete(idSelected)}>
             Delete
           </Button>
         </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:plus-fill'} sx={{ mr: 1 }} />
-          <Button variant="contained">
-            Add Description
-          </Button>
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:cloud-upload-outline'} sx={{ mr: 1 }} />
-          <Button variant="contained">
-            Add Image
-          </Button>
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:edit-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="contained">
-            Edit Description
-          </Button>
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:edit-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="contained">
-            Edit Image
-          </Button>
-        </MenuItem>
       </Popover>
+      <TemplateDetails openDialog={openDialog} handleCloseDialog={handleCloseDialog} template={templateId} />
+      <EditTemplate openDialog={openDialogEdit} handleCloseDialog={handleCloseDialogEdit} template={templateId}/>
     </>
   );
 }
