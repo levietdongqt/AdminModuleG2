@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 // @mui
 import {
   Card,
@@ -29,17 +29,17 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
 
-import {TestAdmin } from '../api/CallService';
+import {getAllUsers,getUserById,updateUser} from '../api/UserServices'
 
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
+  { id: 'name', label: 'Full Name', alignRight: false },
+  { id: 'email', label: 'Email', alignRight: false },
+  { id: 'phone', label: 'Phone', alignRight: false },
+  { id: 'gender', label: 'Gender', alignRight: false },
   { id: 'isVerified', label: 'Verified', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
   { id: '' },
@@ -91,6 +91,30 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [users,setUsers] = useState([]);
+
+  const [search,setSearch] = useState('');
+
+  const [st,setSt] = useState(true);
+
+  const [idSelected, setIdSelected] = useState(null);
+
+  useEffect(() => {
+    GetAllUserAsync(search,true,1,1000);
+  }, [search,st]);
+
+  const GetAllUserAsync = async (search,st,page,pageSize) => {
+    const response = await getAllUsers(search,st,page,pageSize);
+
+    console.log(response);
+
+    setUsers(response.data.result);
+  };
+
+  const handleFilterByEmailOrPhone = (event)=>{
+    setSearch(event.target.value);
+  }
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -107,18 +131,12 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = users.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
-  const handleTest = async () => {
-    
-    console.log(`Vô roiiiiii ${localStorage.getItem("token")}`)
-    const response2 = await TestAdmin();
-    console.log(`Admin: ${response2.data}`);
-  }
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     console.log(selectedIndex);
@@ -144,35 +162,43 @@ export default function UserPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
+
+  const handleDelete = async (idSelected) =>{
+    const data = await getUserById(idSelected);
+    data.result.status = "Disabled";
+    console.log(data);
+
+    const response = await updateUser(data);
+    console.log(response);
+
+
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const handleRowClick = (id) =>{
+    setIdSelected(id);
+  }
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
+
+  const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> User</title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom color={'Highlight'}>
             User
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleTest}>
-            New User
-          </Button>
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -181,39 +207,40 @@ export default function UserPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={users.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                    const selectedUser = selected.indexOf(row.id) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={row.id} tabIndex={-1} role="checkbox"  onClick={() => handleRowClick(row.id)}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={row.email} src={`https://localhost:5000${row.Avatar}`} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {row.FullName}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{row.email}</TableCell>
 
-                        <TableCell align="left">{role}</TableCell>
+                        <TableCell align="left">{row.phone}</TableCell>
 
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{row.gender ? 'Male' : 'Female'}</TableCell>
+
+                        <TableCell align="left">{row.emailConfirmed ? 'Yes' : 'No'}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
+                          <Label color={(row.status === 'banned' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
                         </TableCell>
 
                         <TableCell align="right">
@@ -261,7 +288,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={users.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -279,7 +306,7 @@ export default function UserPage() {
         PaperProps={{
           sx: {
             p: 1,
-            width: 140,
+            width: 200,
             '& .MuiMenuItem-root': {
               px: 1,
               typography: 'body2',
@@ -289,13 +316,32 @@ export default function UserPage() {
         }}
       >
         <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+            Details
+          </Button>
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+            Delete
+          </Button>
+        </MenuItem>
+
+        <MenuItem sx={{ color: 'error.main' }}>
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+          
+          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          Show Review
+          </Button>
+        </MenuItem>
+
+        <MenuItem sx={{ color: 'error.main' }}>
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />        
+          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          Show FeedBack
+          </Button>
         </MenuItem>
       </Popover>
     </>

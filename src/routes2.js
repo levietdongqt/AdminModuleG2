@@ -13,6 +13,7 @@ import useGetUserRole from './hooks/useGetUserRole';
 
 
 import LoginPage from './pages/LoginPage';
+import Page403 from './pages/Page403';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ export default function Router2() {
   const [admin] = useGetUserRole(currentUser);
   console.log(admin);
   return(
-    admin ?(
+    !admin ?(
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
         <Route path="app" element={<DashboardAppPage />} />
@@ -32,11 +33,16 @@ export default function Router2() {
       </Route>
       <Route path="login" element={<LoginPage />} />
       <Route path="404" element={<Page404 />} />
+      <Route path="403" element={<Page403 />} />
        <Route path="*" element={<Navigate to="/404" />} />
        <Route path="/*" element={<Navigate to="/404" />} />
     </Routes>): 
       <Routes>
-       <Route path="login" element={<LoginPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="403" element={<Page403 />} />
+        <Route path="app" element={<Navigate to="/403" />} />
+        <Route path="user" element={<Navigate to="/403" />} />
+        <Route path="template" element={<Navigate to="/403" />} />
       </Routes>
   )
 }

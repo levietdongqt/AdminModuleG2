@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import JoditEditor from 'jodit-react';
+
 import {
   Paper,
   Button,
@@ -13,11 +14,11 @@ import {
   DialogContent,
   DialogActions,
   styled,
-  InputLabel,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import UpdateSchemaMap from '../../../validations/UpdateValidation';
 import { fDateTime } from '../../../utils/formatTime';
+import { UpdateTemplate } from '../../../api/TemplateService';
 
 const CustomDialogContent = styled(DialogContent)({
   display: 'flex',
@@ -54,6 +55,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
     handleSubmit,
     setValues,
     setTouched,
+    isSubmitting,
   } = useFormik({
     initialValues: {
       name: template.name,
@@ -61,9 +63,28 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
       descriptionArray: template.descriptionTemplates,
     },
     validationSchema: UpdateSchemaMap,
-    onSubmit: async (values) => {},
+    onSubmit: async (values) => {
+      console.log('Submit button clicked!');
+      const floatValue = parseFloat(values.pricePlusPerOne);
+      console.log(fileList);
+
+      const formData = new FormData();
+      formData.append('Name', values.name);
+      formData.append('PricePlusPerOne', floatValue.toString());
+      values.descriptionArray.forEach((item, index) => {
+        formData.append(`DescriptionTemplates[${index}].id`, item.id);
+        formData.append(`DescriptionTemplates[${index}].title`, item.title);
+        formData.append(`DescriptionTemplates[${index}].description`, item.description);
+        formData.append(`DescriptionTemplates[${index}].templateId`, item.templateId);
+      });
+      fileList.forEach((item, index) => {
+        formData.append(`formFileList`, item);
+      });
+      console.log(values);
+      const response = await UpdateTemplate(template.id,formData);
+      console.log(response);
+    },
   });
-  console.log(values.name);
 
   useEffect(() => {
     setValues({
@@ -76,9 +97,9 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
       setImages([]);
       setFileList([]);
     }
-  }, [template,openDialog]);
+  }, [template, openDialog]);
 
-  const handleImageUpload = (event, index) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files[0]; // Lấy ra tệp ảnh từ sự kiện tải lên
     const updatedSelectedFiles = [...fileList];
     updatedSelectedFiles.push(file);
@@ -96,22 +117,21 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
     }
   };
 
-
   return (
-    <form>
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        PaperProps={{
-          style: {
-            backgroundColor: 'whitesmoke', // thay đổi màu nền theo ý muốn của bạn
-            width: 1000, // thay đổi độ rộng cố định theo ý muốn của bạn
-            height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-          },
-        }}
-      >
+    <Dialog
+      open={openDialog}
+      onClose={handleCloseDialog}
+      maxWidth="md"
+      PaperProps={{
+        style: {
+          backgroundColor: 'whitesmoke', // thay đổi màu nền theo ý muốn của bạn
+          width: 1000, // thay đổi độ rộng cố định theo ý muốn của bạn
+          height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+        },
+      }}
+    >
+      <form onSubmit={handleSubmit}>
         <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
           {template.name}
         </DialogTitle>
@@ -137,7 +157,6 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
               fullWidth
               id="pricePlusPerOne"
               name="pricePlusPerOne"
-              type="text"
               value={values.pricePlusPerOne}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -157,9 +176,14 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                     id={`title-${index}`}
                     name={`title-${index}`}
                     type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     value={ele.title}
+                    onChange={(event) => {
+                      const { value } = event.target;
+                      const updatedArray = [...values.descriptionArray];
+                      updatedArray[index].title = value;
+                      setFieldValue('descriptionArray', updatedArray);
+                      handleBlur({ target: { name: `title-${index}` } });
+                    }}
                   />
                   <JoditEditor
                     id={`description-${index}`}
@@ -167,8 +191,10 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                     ref={editor}
                     value={ele.description}
                     onChange={(newContent) => {
-                      setFieldValue('description', newContent);
-                      handleBlur({ target: { name: 'description' } });
+                      const updatedArray = [...values.descriptionArray];
+                      updatedArray[index].description = newContent;
+                      setFieldValue('descriptionArray', updatedArray);
+                      handleBlur({ target: { name: `description-${index}` } });
                     }}
                   />
                 </div>
@@ -193,63 +219,64 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                         src={`https://localhost:5000${image.imageUrl}`}
                       />
                     </Paper>
-                    <Button
-                      component="label"
-                      variant="contained"
-                      startIcon={<CloudUploadIcon />}
-                      color="primary"
-                      sx={
-                        {
-                          // ... các style khác
-                        }
-                      }
-                    >
-                      Tải lên tệp
-                      <VisuallyHiddenInput
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleImageUpload(e, index)}
-                      />
-                    </Button>
                   </Grid>
                 ))}
-              </Grid>            
-            )}
-            <Grid container spacing={2}>
-          {images.map((image, index) => {
-            return (
-              <Grid item key={index}>
-                <Box
-                  component="img"
-                  sx={{
-                    height: 100,
-                    width: 200,
-                    maxHeight: { xs: 233, md: 167 },
-                    maxWidth: { xs: 350, md: 250 },
-                    border: '0.5px thin #000', // Thêm khung đen 2px
-                    borderRadius: 1, // Bo tròn góc 8px
-                    transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
-                    '&:hover': {
-                      transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
-                      boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
-                    },
-                  }}
-                  alt={`Image ${index}`}
-                  src={image.imageUrl}
-                />
               </Grid>
-            );
-          })}
-        </Grid>
+            )}
+            <Button
+              component="label"
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+              color="primary"
+              sx={
+                {
+                  // ... các style khác
+                }
+              }
+            >
+              Upload
+              <VisuallyHiddenInput
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => handleImageUpload(e)}
+              />
+            </Button>
+            <Grid container spacing={2}>
+              {images.map((image, index) => {
+                return (
+                  <Grid item key={index}>
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 100,
+                        width: 200,
+                        maxHeight: { xs: 233, md: 167 },
+                        maxWidth: { xs: 350, md: 250 },
+                        border: '0.5px thin #000', // Thêm khung đen 2px
+                        borderRadius: 1, // Bo tròn góc 8px
+                        transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
+                        '&:hover': {
+                          transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
+                          boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
+                        },
+                      }}
+                      alt={`Image ${index}`}
+                      src={image.imageUrl}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
           </div>
         </CustomDialogContent>
-
         <DialogActions>
-          <Button onClick={handleSubmit}>Edit</Button>
+          <Button type="submit" loading={isSubmitting}>
+            Edit
+          </Button>
           <Button onClick={handleCloseDialog}>Close</Button>
         </DialogActions>
-      </Dialog>
-    </form>
+      </form>
+    </Dialog>
   );
 }

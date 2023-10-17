@@ -1,20 +1,18 @@
 import axios from "axios";
+import  baseRequest  from '../contexts/AxiosContext';
 
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/User/GetAll`,
-      {
-        params: {
-          search,
-          st,
-          page,
-          pageSize,
-        },
-      }
-    );
+    let response; 
+    if(search !== null){
+      response = await baseRequest.get(
+        `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?search=${search}&&page=${page}&&pageSize=${pageSize}`)
+    }else{
+      response = await baseRequest.get(
+        `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?page=${page}&&pageSize=${pageSize}`)
+    }
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching data:", error);
     throw error;
@@ -22,33 +20,26 @@ export const getAllUsers = async (search, st, page, pageSize) => {
 };
 
 export const getUserById = async (id) => {
-  const { data } = await axios.get(
+  const { data } = await baseRequest.get(
     `${process.env.REACT_APP_API_BASE_URL}/User/${id}`
   );
   return data;
 };
 
 export const updateUser = async (userDTO) => {
-  try {
-    const response = await axios.put(
+    const response = await baseRequest.put(
       `${process.env.REACT_APP_API_BASE_URL}/User/Edit`,
       userDTO // Truyền dữ liệu cần cập nhật từ userDTO
     );
 
-    if (response.status === 200) {
+    
       // Xử lý nếu API trả về mã 200 OK
-      return response;
-    } 
-      // Xử lý nếu có lỗi
-      throw new Error("Failed to update user");
-  } catch (error) {
-    // Xử lý nếu có lỗi mạng hoặc lỗi từ server
-    throw new Error(error.message);
-  }
+      return response;     // Xử lý nếu có lỗi
+  
 };
 
 export const changePassword = async (userDTO) => {
-  const response = await axios.put(
+  const response = await baseRequest.put(
     `${process.env.REACT_APP_API_BASE_URL}/User/ChangePass`,
     userDTO // Truyền requestData chứa cả userDTO, oldPassword, và newPassword
   );
@@ -57,7 +48,7 @@ export const changePassword = async (userDTO) => {
 };
 
 export const deleteUser = async (id) => {
-  const { data } = await axios.delete(
+  const { data } = await baseRequest.delete(
     `${process.env.REACT_APP_API_BASE_URL}/users/${id}`
   );
   return data;
@@ -71,7 +62,7 @@ export const addFavorite = async (id, productId) => {
 };
 
 export const deleteFavorite = async (id, productId) => {
-  const { data } = await axios.delete(
+  const { data } = await baseRequest.delete(
     `${process.env.REACT_APP_API_BASE_URL}/users/${id}/favorite/${productId}`
   );
   return data;

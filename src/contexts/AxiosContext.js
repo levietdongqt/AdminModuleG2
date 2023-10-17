@@ -17,7 +17,7 @@ const baseRequest = axios.create({
    // timeout: 5000, // Thời gian timeout cho mỗi yêu cầu
 });
 baseRequest.interceptors.request.use((config) =>{
-  var token = GetToken();
+  const token = GetToken();
   if(token) {
       config.headers.Authorization = `Bearer ${token}`;
   }
