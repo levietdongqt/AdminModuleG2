@@ -1,21 +1,5 @@
 import axios, { AxiosError } from "axios";
-
-const apiClient = axios.create(
-    {
-        baseURL: 'https://localhost:5000'    }
-);
-
-const getToken = () => {
-    return localStorage.getItem("token");
-};
-
-apiClient.interceptors.request.use((config) =>{
-    const token = getToken();
-    if(token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+import  baseRequest  from '../contexts/AxiosContext';
 
 export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortBy,isAscending){
     let response;
@@ -31,14 +15,14 @@ export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortB
 }
 
 const GetAllTemplateAsync = async (page,dataPerPage,filterOn,filterQuery,sortBy,isAscending)=> {
-    const response = await apiClient.get(`/api/Template?filterOn=${filterOn}&filterQuery=${filterQuery}&sortBy=${sortBy}&isAscending=${isAscending}&pageNumber=${page}&pageSize=${dataPerPage}`)
+    const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Template?filterOn=${filterOn}&filterQuery=${filterQuery}&sortBy=${sortBy}&isAscending=${isAscending}&pageNumber=${page}&pageSize=${dataPerPage}`)
     return response;
 }
 
 
 export async function GetAllCategories(){
     try{
-        const response = await apiClient.get(`api/Category`);
+        const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Category`);
         return response;
     }catch(error){
         return AxiosError.ERR_BAD_REQUEST;
@@ -47,7 +31,7 @@ export async function GetAllCategories(){
 
 export async function GetAllSizes(){
     try{
-        const response = await apiClient.get(`api/Size`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/Size`);
         return response;
     }catch(error){
         return AxiosError.ERR_BAD_REQUEST;
@@ -56,7 +40,7 @@ export async function GetAllSizes(){
 
 export async function AddTemplate(formData){
     try{
-        const response = await apiClient.post(`/api/Template`,formData,{
+        const response = await baseRequest.post(`${process.env.REACT_APP_API_BASE_URL}/Template`,formData,{
             headers:{
                 'Content-Type' : 'multipart/form-data',
             },
@@ -69,7 +53,7 @@ export async function AddTemplate(formData){
 
 export async function DeleteTemplate(id){
     try{
-        const response = await apiClient.delete(`/api/Template/${id}`);
+        const response = await baseRequest.delete(`${process.env.REACT_APP_API_BASE_URL}/Template/${id}`);
         return response;
     }catch(error){
         return error.response;
@@ -78,7 +62,29 @@ export async function DeleteTemplate(id){
 
 export async function DeleteAllTemplate(array){
     try{
-        const response = await apiClient.put(`/api/Template`,array);
+        const response = await baseRequest.put(`${process.env.REACT_APP_API_BASE_URL}/Template`,array);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}
+
+export async function GetTemplateById(id){
+    try{
+        const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Template/${id}`);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}
+
+export async function UpdateTemplate(id,formData){
+    try{
+        const response = await baseRequest.put(`${process.env.REACT_APP_API_BASE_URL}/Template/${id}`,formData,{
+            headers:{
+                'Content-Type' : 'multipart/form-data',
+            },
+        });
         return response;
     }catch(error){
         return error.response;
