@@ -6,8 +6,11 @@ export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortB
     try{       
         const useDefaultSort = sortBy === 'name' && isAscending === true;
         const sortField = useDefaultSort ? 'name' : sortBy;
-
-        response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, useDefaultSort);
+        if(sortField === 'name'){
+            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, useDefaultSort);
+        }else{
+            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, isAscending);
+        }       
         return response;
     }catch(error){
         return AxiosError.ERR_BAD_REQUEST;

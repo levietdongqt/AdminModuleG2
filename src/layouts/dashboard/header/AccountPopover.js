@@ -67,7 +67,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={currentUser.Avatar} alt="photoURL" />
+        <Avatar src={`${process.env.REACT_APP_API_BASE_IMAGE}${currentUser.avatar}`} alt="photoURL" />
       </IconButton>
 
       <Popover

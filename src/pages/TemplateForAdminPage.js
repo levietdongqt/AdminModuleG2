@@ -103,7 +103,7 @@ export default function TemplateForAdminPage() {
 
   const [selected, setSelected] = useState([]);
 
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('CreateDate');
 
   const [filterName, setFilterName] = useState('');
 
@@ -119,12 +119,12 @@ export default function TemplateForAdminPage() {
   const [filterQuery, setFilterQuery] = useState('');
 
   const [sortBy, setSortBy] = useState('');
-  const [isAscending, setIsAscending] = useState(true);
+  const [isAscending, setIsAscending] = useState(false);
   const [idSelected, setIdSelected] = useState(null);
 
   useEffect(() => {
-    GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery, sortBy, isAscending);
-  }, [filterQuery, sortBy, isAscending]);
+    GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery,orderBy, isAscending);
+  }, [filterQuery, orderBy, isAscending,openDialogEdit,idSelected]);
 
   const GetAllTemplateAsync = async (page, dataPerPage, filterOn, filterQuery, sortBy, isAscending) => {
     const response = await GetAllTemplate(page, dataPerPage, filterOn, filterQuery, sortBy, isAscending);
@@ -144,6 +144,7 @@ export default function TemplateForAdminPage() {
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
+    console.log(isAsc)
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
     setSortBy(property);
@@ -219,7 +220,6 @@ export default function TemplateForAdminPage() {
   const handleClickEditDialog = async (id) => {
     const response = await GetTemplateById(id);
     setTemplateId(response.data.result);
-    console.log(templateId);
     setOpenDialogEdit(true);
   }
   const handleCloseDialogEdit = () => {
@@ -298,7 +298,7 @@ export default function TemplateForAdminPage() {
                                     },
                                   }}
                                   alt={`Image ${index}`}
-                                  src={`https://localhost:5000${image.imageUrl}`}
+                                  src={`${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`}
                                   style={imageStyle}
                                 />
                               </div>

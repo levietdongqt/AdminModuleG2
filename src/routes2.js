@@ -22,7 +22,7 @@ export default function Router2() {
   const [admin] = useGetUserRole(currentUser);
   console.log(admin);
   return(
-    !admin ?(
+    admin ?(
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
         <Route path="app" element={<DashboardAppPage />} />

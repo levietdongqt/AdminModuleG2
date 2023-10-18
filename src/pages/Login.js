@@ -35,8 +35,8 @@ const Login = () => {
         setCookie('currentUser', result.data.result, { path: '/app' });
         setTokenCookie('accessToken',result.data.token,{ path: '/app' })
       } else {
-        removeCookie('currentUser', { path: '/app' });
-        removeTokenCookie('accessToken',result.data.token,{ path: '/app' })
+        setCookie('currentUser', result.data.result, { path: '/app',expires:0 });
+        setTokenCookie('accessToken',result.data.token,{ path: '/app',expires:0 })
       };
     } else {
       resetForm();

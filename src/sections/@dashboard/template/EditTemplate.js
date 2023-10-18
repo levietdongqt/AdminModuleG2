@@ -15,6 +15,7 @@ import {
   DialogActions,
   styled,
 } from '@mui/material';
+import { useToast } from '@chakra-ui/react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import UpdateSchemaMap from '../../../validations/UpdateValidation';
 import { fDateTime } from '../../../utils/formatTime';
@@ -40,6 +41,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 export default function EditTemplate({ openDialog, handleCloseDialog, template }) {
+  const toast = useToast();
   const [fileList, setFileList] = useState([]);
   const [images, setImages] = useState([]);
   const editor = useRef(null);
@@ -70,7 +72,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
 
       const formData = new FormData();
       formData.append('Name', values.name);
-      formData.append('PricePlusPerOne', floatValue.toString());
+      formData.append('PricePlusPerOne', values.pricePlusPerOne);
       values.descriptionArray.forEach((item, index) => {
         formData.append(`DescriptionTemplates[${index}].id`, item.id);
         formData.append(`DescriptionTemplates[${index}].title`, item.title);
@@ -82,7 +84,23 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
       });
       console.log(values);
       const response = await UpdateTemplate(template.id,formData);
-      console.log(response);
+      if (response.data.status === 200) {
+        toast({
+          title: 'Update',
+          description: 'You have Update successfully.',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Error!',
+          description: 'Wrong Update.',
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     },
   });
 
@@ -216,7 +234,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                           }
                         }
                         alt={`Image ${index}`}
-                        src={`https://localhost:5000${image.imageUrl}`}
+                        src={`${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`}
                       />
                     </Paper>
                   </Grid>
