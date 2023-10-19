@@ -26,6 +26,7 @@ import {
   Paper,
   Alert,
 } from '@mui/material';
+import { useToast } from '@chakra-ui/react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -50,6 +51,8 @@ const VisuallyHiddenInput = styled('input')({
 
 
 export default function CreateTemplatePage() {
+  const toast = useToast();
+  const navigate = useNavigate();
   const [fileList, setFileList] = useState([]);
   const [images, setImages] = useState([]);
   const [categorySelected, setCategorySelected] = useState({});
@@ -93,6 +96,25 @@ export default function CreateTemplatePage() {
       });
 
       const response = await AddTemplate(formData);
+      console.log(response);
+      if (response.data.status === 201) {
+        toast({
+          title: 'Create',
+          description: 'You have created successfully.',
+          status: 'Created',
+          duration: 2000,
+          isClosable: true,
+        });
+        navigate("/template")
+      } else {
+        toast({
+          title: 'Error!',
+          description: 'Wrong created.',
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     },
   });
 

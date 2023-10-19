@@ -124,7 +124,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
                         },
                       }}
                       alt={`Image ${index}`}
-                      src={`https://localhost:5000${image.imageUrl}`}
+                      src={`${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`}
                     />
                   </Paper>
                 </Grid>

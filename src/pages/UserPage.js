@@ -27,7 +27,7 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { ShowReviews, UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 
 import {getAllUsers,getUserById,updateUser} from '../api/UserServices'
@@ -98,6 +98,10 @@ export default function UserPage() {
   const [st,setSt] = useState(true);
 
   const [idSelected, setIdSelected] = useState(null);
+
+  const [openDialogReview,setOpenDialogReview] = useState(false);
+
+  const [user,setUser] = useState({});
 
   useEffect(() => {
     GetAllUserAsync(search,true,1,1000);
@@ -178,6 +182,15 @@ export default function UserPage() {
     setIdSelected(id);
   }
 
+  const handleClickReviewDialog = async (id) => {
+    const data = await getUserById(id);
+    setUser(data.result);
+    setOpenDialogReview(true);
+  }
+  const handleCloseDialogReview = () => {
+    setOpenDialogReview(false);
+  }
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
   const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
@@ -224,7 +237,7 @@ export default function UserPage() {
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={row.email} src={`https://localhost:5000${row.Avatar}`} />
+                            <Avatar alt={row.email} src={`${process.env.REACT_APP_API_BASE_IMAGE}${row.avatar}`} />
                             <Typography variant="subtitle2" noWrap>
                               {row.FullName}
                             </Typography>
@@ -332,7 +345,7 @@ export default function UserPage() {
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
           
-          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          <Button variant="contained" onClick={() => handleClickReviewDialog(idSelected)}>
           Show Review
           </Button>
         </MenuItem>
@@ -344,6 +357,7 @@ export default function UserPage() {
           </Button>
         </MenuItem>
       </Popover>
+      <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user}/>
     </>
   );
 }
