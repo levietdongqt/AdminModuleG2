@@ -17,3 +17,13 @@ export async function UpdateAllReview(reviews){
         return error.response;
     }
 }
+
+
+export async function GetReviewsByStatus(userId,isImportant){
+    try{
+        const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Review/GetByIsImportant?userId=${userId}&isImportant=${isImportant}`);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}

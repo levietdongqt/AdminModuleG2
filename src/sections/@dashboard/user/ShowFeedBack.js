@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -17,13 +17,13 @@ import {
   TablePagination,
   TableHead,
   TableSortLabel,
-  Avatar,
-  Typography,
-  Box,
   Popover,
-  MenuItem,
+  Typography,
+  TextField,
+  InputLabel,
 } from '@mui/material';
 import { useToast } from '@chakra-ui/react';
+import JoditEditor from 'jodit-react';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // components
@@ -33,7 +33,7 @@ import Scrollbar from '../../../components/scrollbar';
 import { fDateTime } from '../../../utils/formatTime';
 
 import { TemplateListHead } from '../template';
-import { DeleteReview, UpdateAllReview,GetReviewsByStatus } from '../../../api/ReviewService';
+import { UpdateAllFeedBack, GetFeedBacksByStatus,SendMail } from '../../../api/FeedBackServices';
 
 const CustomDialogContent = styled(DialogContent)({
   display: 'flex',
@@ -61,24 +61,26 @@ const CustomTableHead = styled(TableHead)({
 const TABLE_HEAD = [
   { id: 'isImportant', label: 'Important', alignRight: false },
   { id: 'date', label: 'Date', alignRight: false },
+  { id: 'email', label: 'Email', alignRight: false },
   { id: 'content', label: 'Content', alignRight: false },
-  { id: 'rating', label: 'Rating', alignRight: false },
   { id: '' },
 ];
 
-export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
+export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
   const toast = useToast();
-  const [showModal, setShowModal] = useState(false);
-
+  const editor = useRef(null);
   const [open, setOpen] = useState(null);
+  const [openMail, setOpenMail] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [resetCount, setResetCount] = useState(0);
   const [selectedId, setSelectedId] = useState(0);
   const [maxLength, setMaxLength] = useState(10);
-  const [reviews, setReviews] = useState(user.reviews);
-
   const [popoverContent, setPopoverContent] = useState('');
+  const [feedBacks, setFeedBacks] = useState(user.feedBacks);
+
+  const [subject,setSubject] = useState('');
+  const [message,setMessage] = useState('');
+  const [email,setEmail] = useState('');
 
   const handleOpenMenu = (event, content) => {
     setOpen(event.currentTarget);
@@ -88,16 +90,23 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
     setOpen(null);
   };
 
+  const handleOpenMail = (event, content) => {
+    setOpenMail(event.currentTarget);
+  };
+
+  const handleCloseMail = () => {
+    setOpenMail(null);
+  };
+
   useEffect(() => {
     if (openDialog) {
-      setReviews(user.reviews);
-      // setContent((user.content.length >maxLength)?`${user.content.substring(0,maxLength)}...`:user.content);
+      setFeedBacks(user.feedBacks);
     } else {
-      UpdateAllReview(reviews).then((result) => {
+      UpdateAllFeedBack(feedBacks).then((result) => {
         console.log(result);
       });
     }
-    handleUpdateReviews(selectedId);
+    handleUpdateFeedBacks(selectedId);
   }, [user, openDialog, selectedId]);
 
   const handleChangePage = (event, newPage) => {
@@ -109,54 +118,42 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
     setPage(0);
   };
 
-  const handleUpdateReviews = (id) => {
-    if (user.reviews && user.reviews.length > 0) {
-      const updatedReviews = user.reviews.filter((row) => row.id !== id);
-      setReviews(updatedReviews);
+  const handleUpdateFeedBacks = (id) => {
+    if (user.feedBacks && user.feedBacks.length > 0) {
+      const updatedFeedBacks = user.feedBacks.filter((row) => row.id !== id);
+      setFeedBacks(updatedFeedBacks);
     }
   };
 
   const handleIsImportant = (id) => {
-    const updatedReviews = reviews.map((review) =>
-      review.id === id ? { ...review, isImportant: !review.isImportant } : review
+    const updatedFeedBacks = feedBacks.map((feedback) =>
+      feedback.id === id ? { ...feedback, isImportant: !feedback.isImportant } : feedback
     );
-    setReviews(updatedReviews);
-    console.log(updatedReviews);
+    setFeedBacks(updatedFeedBacks);
+    console.log(updatedFeedBacks);
   };
+
+  const handleShowImportant = async () => {
+    const response = await GetFeedBacksByStatus(user.id, true);
+    console.log(response);
+    setFeedBacks(response.data.result);
+  };
+  const handleShowAll = () => {
+    setFeedBacks(user.feedBacks);
+  };
+
+  const handleSubmit = async ()=>{
+    const response = await SendMail(email,subject,message,"Feedback");
+    console.log(response);
+  }
+
+  const handleClickSubject = (event,email) =>{
+    setSubject(event.target.value);
+    setEmail(email);
+    
+  }
+
   
-
-  const handleShowImportant = async  () =>{
-    const response = await GetReviewsByStatus(user.id,true);
-    console.log(response);
-    setReviews(response.data.result);
-  }
-  const handleShowAll = () =>{
-    setReviews(user.reviews);
-  }
-
-  const handleDelete = async (id) => {
-    setSelectedId(id);
-    const response = await DeleteReview(id);
-    console.log(response);
-    if (response.data.status === 200) {
-      toast({
-        title: 'Delete',
-        description: 'You have delete successfully.',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-      });
-      setReviews(reviews.filter((review) => review.id !== id));
-    } else {
-      toast({
-        title: 'Error!',
-        description: 'Wrong delete.',
-        status: 'error',
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-  };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - user.reviews.length) : 0;
 
@@ -167,15 +164,14 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
       maxWidth="md"
       PaperProps={{
         style: {
-          backgroundColor: 'whitesmoke', // thay đổi màu nền theo ý muốn của bạn
+          backgroundColor: '#F5F7F8', // thay đổi màu nền theo ý muốn của bạn
           width: 1200, // thay đổi độ rộng cố định theo ý muốn của bạn
           height: 600, // thay đổi chiều dài cố định theo ý muốn của bạn
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-          borderRadius: 10,
         },
       }}
     >
-      <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
+      <DialogTitle color={'#04364A'} align={'center'} style={{ fontSize: 30 }}>
         {user.fullName}
       </DialogTitle>
       <CustomDialogContent>
@@ -183,8 +179,12 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
           <Card>
             <Scrollbar>
               <CustomTableContainer>
-                <Button variant="outlined" onClick={handleShowAll}>Show All</Button>
-                <Button variant="outlined" onClick={handleShowImportant}>Show Important</Button>
+                <Button variant="outlined" onClick={handleShowAll}>
+                  Show All
+                </Button>
+                <Button variant="outlined" onClick={handleShowImportant}>
+                  Show Important
+                </Button>
                 <Table>
                   <CustomTableHead>
                     <TableRow>
@@ -196,9 +196,9 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                     </TableRow>
                   </CustomTableHead>
                   <TableBody>
-                    {reviews &&
-                      reviews.length > 0 &&
-                      reviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {feedBacks &&
+                      feedBacks.length > 0 &&
+                      feedBacks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                         return (
                           <TableRow hover key={row.id} tabIndex={-1}>
                             <TableCell align="left">
@@ -210,7 +210,9 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                                 )}
                               </IconButton>
                             </TableCell>
-                            <TableCell align="left">{fDateTime(row.reviewDate)}</TableCell>
+                            <TableCell align="left">{fDateTime(row.feedBackDate)}</TableCell>
+
+                            <TableCell align="left">{row.email}</TableCell>
 
                             <TableCell align="left">
                               {row.content.length > maxLength
@@ -223,11 +225,9 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                               )}
                             </TableCell>
 
-                            <TableCell align="left">{row.rating}</TableCell>
-
                             <TableCell align="right" sx={{ alignItems: 'center' }}>
-                              <IconButton onClick={() => handleDelete(row.id)}>
-                                <Iconify icon={'eva:trash-2-outline'} />
+                              <IconButton onClick={(event) => handleOpenMail(event)}>
+                                <Iconify icon={'material-symbols:mail-outline'} />
                               </IconButton>
                             </TableCell>
                             <Popover
@@ -238,7 +238,7 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                               PaperProps={{
                                 sx: {
-                                  p: 2,
+                                  p: 1,
                                   width: 500,
                                   '& .MuiMenuItem-root': {
                                     px: 1,
@@ -253,6 +253,51 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                             >
                               <Typography variant="h6" paragraph>
                                 {popoverContent}
+                              </Typography>
+                            </Popover>
+                            <Popover
+                              open={Boolean(openMail)}
+                              anchorEl={openMail}
+                              onClose={handleCloseMail}
+                              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                              PaperProps={{
+                                sx: {
+                                  p: 1,
+                                  width: 500,
+                                  '& .MuiMenuItem-root': {
+                                    px: 1,
+                                    typography: 'body2',
+                                    borderRadius: 0.75,
+                                  },
+                                  backgroundColor: 'whitesmoke',
+                                  borderRadius: '8px',
+                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                },
+                              }}
+                            >
+                              <Typography variant="h6" paragraph>
+                                <Typography variant="h4" gutterBottom color="secondary">
+                                  Send Mail
+                                </Typography>
+                                <InputLabel id="demo-simple-select-label" value>Message:</InputLabel>                               
+                                <TextField label="Subject" fullWidth type="text" onChange={(event) => handleClickSubject(event,row.email)}/>
+                                <InputLabel id="demo-simple-select-label">Message:</InputLabel>
+                                <JoditEditor
+                                  id="description"
+                                  name="description"
+                                  ref={editor}
+                                  onChange={(newContent) => setMessage(newContent)}
+                                />
+                                <Button
+                                  fullWidth
+                                  size="large"
+                                  type="submit"
+                                  variant="contained"
+                                  onClick={handleSubmit}
+                                >
+                                  Send
+                                </Button>
                               </Typography>
                             </Popover>
                           </TableRow>
@@ -270,7 +315,7 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={(reviews && reviews.length) > 0 ? reviews.length : 0}
+              count={(feedBacks && feedBacks.length) > 0 ? feedBacks.length : 0}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}

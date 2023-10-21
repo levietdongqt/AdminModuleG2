@@ -27,7 +27,7 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { ShowReviews, UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { ShowReviews,ShowFeedBack, UserListHead, UserListToolbar, UserDetails } from '../sections/@dashboard/user';
 // mock
 
 import {getAllUsers,getUserById,updateUser} from '../api/UserServices'
@@ -100,7 +100,8 @@ export default function UserPage() {
   const [idSelected, setIdSelected] = useState(null);
 
   const [openDialogReview,setOpenDialogReview] = useState(false);
-
+  const [openDialogFeedBack,setOpenDialogFeedBack] = useState(false);
+  const [openDialogDetails,setOpenDialogDetails] = useState(false);
   const [user,setUser] = useState({});
 
   useEffect(() => {
@@ -190,6 +191,27 @@ export default function UserPage() {
   const handleCloseDialogReview = () => {
     setOpenDialogReview(false);
   }
+
+  const handleClickFeedBackDialog = async (id) =>{
+    const data = await getUserById(id);
+    setUser(data.result);
+    setOpenDialogFeedBack(true);
+  }
+  const handleCloseDialogFeedBack = () => {
+    setOpenDialogFeedBack(false);
+  }
+
+  const handleDetails = async (id) =>{
+    const data = await getUserById(id);
+    setUser(data.result);
+    setOpenDialogDetails(true);
+  }
+
+  const handleCloseDialogDetails = () => {
+    setOpenDialogDetails(false);
+  }
+
+  
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
@@ -325,39 +347,42 @@ export default function UserPage() {
               typography: 'body2',
               borderRadius: 0.75,
             },
+            backgroundColor: 'whitesmoke'
           },
         }}
       >
         <MenuItem>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          <Button variant="outlined" onClick={() => handleDetails(idSelected)}>
             Details
           </Button>
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
             Delete
           </Button>
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+        <MenuItem sx={{ color: 'info.main' }}>
+          <Iconify icon={'octicon:code-review-24'} sx={{ mr: 1 }} />
           
-          <Button variant="contained" onClick={() => handleClickReviewDialog(idSelected)}>
+          <Button variant="outlined" onClick={() => handleClickReviewDialog(idSelected)}>
           Show Review
           </Button>
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />        
-          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+        <MenuItem sx={{ color: 'info.main' }}>
+          <Iconify icon={'codicon:feedback'} sx={{ mr: 1 }} />        
+          <Button variant="outlined" onClick={() => handleClickFeedBackDialog(idSelected)}>
           Show FeedBack
           </Button>
         </MenuItem>
       </Popover>
       <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user}/>
+      <ShowFeedBack openDialog={openDialogFeedBack} handleCloseDialog={handleCloseDialogFeedBack} user={user}/>
+      <UserDetails openDialog={openDialogDetails} handleCloseDialog={handleCloseDialogDetails} user={user}/>
     </>
   );
 }
