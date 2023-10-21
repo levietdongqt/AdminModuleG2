@@ -67,3 +67,8 @@ export const deleteFavorite = async (id, productId) => {
   );
   return data;
 };
+
+export const TotalUsersInMonth = async () =>{
+  const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/user/Total`);
+  return response;
+}

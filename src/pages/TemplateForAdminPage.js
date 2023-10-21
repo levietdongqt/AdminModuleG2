@@ -385,24 +385,25 @@ export default function TemplateForAdminPage() {
               typography: 'body2',
               borderRadius: 0.75,
             },
+            backgroundColor: 'whitesmoke'
           },
         }}
       >
-        <MenuItem>
+        <MenuItem sx={{ color: 'info.main' }}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button variant="contained" onClick={() => handleClickDialog(idSelected)}>
+          <Button variant="outlined" onClick={() => handleClickDialog(idSelected)}>
             Details
           </Button>
         </MenuItem>
-        <MenuItem>
+        <MenuItem sx={{ color: 'edit.main' }}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button variant="contained" onClick={()=> handleClickEditDialog(idSelected)}>
+          <Button variant="outlined" onClick={()=> handleClickEditDialog(idSelected)}>
             Edit Template
           </Button>
         </MenuItem>
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="contained" onClick={() => handleDelete(idSelected)}>
+          <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
             Delete
           </Button>
         </MenuItem>

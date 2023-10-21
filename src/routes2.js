@@ -38,6 +38,7 @@ export default function Router2() {
        <Route path="/*" element={<Navigate to="/404" />} />
     </Routes>): 
       <Routes>
+        <Route path="/" element={<Navigate to="/login" />}/>
         <Route path="login" element={<LoginPage />} />
         <Route path="403" element={<Page403 />} />
         <Route path="app" element={<Navigate to="/403" />} />
