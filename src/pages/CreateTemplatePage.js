@@ -69,7 +69,7 @@ export default function CreateTemplatePage() {
   const formik = useFormik({
     initialValues: {
       name: '',
-      pricePlus: 0,
+      pricePlusPerOne: 0,
       title: '',
       sizeSelected: [],
       description: '',
@@ -78,7 +78,7 @@ export default function CreateTemplatePage() {
     onSubmit: async (values) => {
       const formData = new FormData();
       formData.append('Name', values.name);
-      formData.append('PricePlus', values.pricePlus);
+      formData.append('PricePlusPerOne', values.pricePlusPerOne);
       formData.append(`DescriptionTemplates[0].Title`, values.title);
       formData.append(`DescriptionTemplates[0].Description`, values.description);
       collectionsSelectedItems.forEach((item, index) => {
@@ -97,15 +97,15 @@ export default function CreateTemplatePage() {
 
       const response = await AddTemplate(formData);
       console.log(response);
-      if (response.data.status === 201) {
+      if (response.data.status === 201) {   
         toast({
           title: 'Create',
           description: 'You have created successfully.',
-          status: 'Created',
+          status: 'success',
           duration: 2000,
           isClosable: true,
         });
-        navigate("/template")
+        navigate("/template")    
       } else {
         toast({
           title: 'Error!',
@@ -176,6 +176,7 @@ export default function CreateTemplatePage() {
     setCollectionsSelectedItems(updatedItems);
   };
 
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <Typography variant="h4" gutterBottom color="secondary">
@@ -186,7 +187,7 @@ export default function CreateTemplatePage() {
         <Paper elevation={3} variant="h2">
           <List primary={collectionsSelectedItems}>
             {collectionsSelectedItems.map((selectedItem, index) => (
-              <ListItem key={selectedItem.id}>
+              <ListItem key={index}>
                 <ListItemText primary={selectedItem.name} />
                 <IconButton
                   edge="start"
@@ -255,16 +256,15 @@ export default function CreateTemplatePage() {
             <MenuItem key={size.id} value={size}>{`${size.width}x${size.length}`}</MenuItem>
           ))}
         </Select>
-        {formik.touched.sizeSelected && formik.errors.sizeSelected ? (
+        {/* {formik.touched.sizeSelected && formik.errors.sizeSelected ? (
           <Alert severity="error">{formik.errors.sizeSelected}</Alert>
-        ) : null}
+        ) : null} */}
         <InputLabel id="demo-simple-select-label">Information</InputLabel>
         <TextField
           label="Template Name"
           fullWidth
           id="name"
           name="name"
-          type="text"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.name}
@@ -274,14 +274,13 @@ export default function CreateTemplatePage() {
         <TextField
           label="Price Plus"
           fullWidth
-          id="pricePlus"
-          name="pricePlus"
-          type="text"
+          id="pricePlusPerOne"
+          name="pricePlusPerOne"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          value={formik.values.pricePlus}
-          error={formik.touched.pricePlus && Boolean(formik.errors.pricePlus)}
-          helperText={formik.touched.pricePlus && formik.errors.pricePlus}
+          value={formik.values.pricePlusPerOne}
+          error={formik.touched.pricePlusPerOne && Boolean(formik.errors.pricePlusPerOne)}
+          helperText={formik.touched.pricePlusPerOne && formik.errors.pricePlusPerOne}
         />
         <InputLabel id="demo-simple-select-label">Description</InputLabel>
 
@@ -329,7 +328,7 @@ export default function CreateTemplatePage() {
           Upload file
           <VisuallyHiddenInput type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
         </Button>
-        {images.length === 0 ? <Alert severity="warning">{'Must be choose in here'}</Alert> : null}
+        {images.length === 0 ? <Alert severity="error">{'Must be choose in here'}</Alert> : null}
         <Grid container spacing={2}>
           {images.map((image, index) => {
             return (
@@ -357,7 +356,7 @@ export default function CreateTemplatePage() {
           })}
         </Grid>
       </Stack>
-      <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={formik.isSubmitting}>
+      <LoadingButton fullWidth size="large" type="submit" variant="contained" >
         Add Template
       </LoadingButton>
     </form>

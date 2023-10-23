@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter, template } from 'lodash';
+import { filter, set, template } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
 
@@ -27,27 +27,36 @@ import {
   TableContainer,
   TablePagination,
   Box,
+  Tooltip,
 } from '@mui/material';
 // components
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { TemplateListHead, TemplateListToolbar, TemplateDetails,EditTemplate } from '../sections/@dashboard/template';
+import {
+  TemplateListHead,
+  TemplateListToolbar,
+  TemplateDetails,
+  EditTemplate,
+  DialogConfirm,
+  AddSize,
+} from '../sections/@dashboard/template';
 
 import { GetAllTemplate, DeleteTemplate, DeleteAllTemplate, GetTemplateById } from '../api/TemplateService';
 
 import { fDateTime } from '../utils/formatTime';
+import { fCurrency } from '../utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'image', label: 'Image', alignRight: false },
-  { id: 'pricePlus', label: 'Price Plus', alignRight: false },
-  { id: 'quantitySold', label: 'Quantity Sold', alignRight: false },
-  { id: 'createDate', label: 'Create Date', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'name', label: 'NAME', alignRight: false },
+  { id: 'image', label: 'IMAGE', alignRight: false },
+  { id: 'pricePlus', label: 'PRICE', alignRight: false },
+  { id: 'quantitySold', label: 'Q.SOLD', alignRight: false },
+  { id: 'createDate', label: 'CREATE DATE', alignRight: false },
+  { id: 'status', label: 'STATUS', alignRight: false },
   { id: '' },
 ];
 
@@ -96,7 +105,11 @@ function applySortFilter(array, comparator, query) {
 export default function TemplateForAdminPage() {
   const [open, setOpen] = useState(null);
   const [openDialog, setOpenDiaLog] = useState(false);
-  const [openDialogEdit,setOpenDialogEdit] = useState(false);
+  const [openDialogEdit, setOpenDialogEdit] = useState(false);
+  const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
+  const [openDialogConfirmAll, setOpenDialogConfirmAll] = useState(false);
+  const [openDialogSize, setOpenDialogSize] = useState(false);
+
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -117,19 +130,19 @@ export default function TemplateForAdminPage() {
 
   const [filterOn, setFilterOn] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
-
+  const [status, setStatus] = useState(true);
+  const [checkStatus, setCheckStatus] = useState(true);
   const [sortBy, setSortBy] = useState('');
   const [isAscending, setIsAscending] = useState(false);
   const [idSelected, setIdSelected] = useState(null);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery,orderBy, isAscending);
-  }, [filterQuery, orderBy, isAscending,openDialogEdit,idSelected]);
+    GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery, orderBy, isAscending, status);
+  }, [filterQuery, orderBy, isAscending, openDialogEdit, idSelected, status, count]);
 
-  const GetAllTemplateAsync = async (page, dataPerPage, filterOn, filterQuery, sortBy, isAscending) => {
-    const response = await GetAllTemplate(page, dataPerPage, filterOn, filterQuery, sortBy, isAscending);
-
-    console.log(response);
+  const GetAllTemplateAsync = async (page, dataPerPage, filterOn, filterQuery, sortBy, isAscending, status) => {
+    const response = await GetAllTemplate(page, dataPerPage, filterOn, filterQuery, sortBy, isAscending, status);
 
     setTemplate(response.data.result);
   };
@@ -144,7 +157,7 @@ export default function TemplateForAdminPage() {
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
-    console.log(isAsc)
+    console.log(isAsc);
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
     setSortBy(property);
@@ -199,18 +212,26 @@ export default function TemplateForAdminPage() {
   };
 
   const handleDelete = async (id) => {
-    const response = await DeleteTemplate(id);
-    console.log(response);
+    setOpenDialogConfirm(true);
+  };
+  const handleCloseConfirm = () => {
+    setOpenDialogConfirm(false);
   };
 
+  const handleCloseConfirmAll = () => {
+    setOpenDialogConfirmAll(false);
+  };
   const handleDeleteAll = async () => {
-    const response = await DeleteAllTemplate(selected);
-    console.log(response);
+    setOpenDialogConfirmAll(true);
+  };
+
+  const GetTemplateByIdAsync = async (id) => {
+    const response = await GetTemplateById(id);
+    setTemplateId(response.data.result);
   };
 
   const handleClickDialog = async (id) => {
-    const response = await GetTemplateById(id);
-    setTemplateId(response.data.result);
+    await GetTemplateByIdAsync(id);
     setOpenDiaLog(true);
   };
   const handleCloseDialog = () => {
@@ -218,13 +239,20 @@ export default function TemplateForAdminPage() {
   };
 
   const handleClickEditDialog = async (id) => {
-    const response = await GetTemplateById(id);
-    setTemplateId(response.data.result);
+    await GetTemplateByIdAsync(id);
     setOpenDialogEdit(true);
-  }
+  };
   const handleCloseDialogEdit = () => {
     setOpenDialogEdit(false);
-  }
+  };
+  const handleAddSize = async (id) => {
+    await GetTemplateByIdAsync(id);
+    setOpenDialogSize(true);
+  };
+
+  const handleCloseDialogSize = () => {
+    setOpenDialogSize(false);
+  };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - Template.length) : 0;
   console.log(emptyRows);
@@ -232,6 +260,31 @@ export default function TemplateForAdminPage() {
   const filteredUsers = applySortFilter(Template, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+
+  const handleChildClick = () => {
+    if (status) {
+      setStatus(false);
+      setCheckStatus(false);
+    } else {
+      setStatus(true);
+      setCheckStatus(true);
+    }
+  };
+
+  const handleAccept = async () => {
+    console.log('sdfsdf');
+    const response = await DeleteTemplate(idSelected);
+    console.log(response);
+    handleCloseConfirm();
+    setOpen(null);
+    setCount(count + 1);
+  };
+  const handleAcceptAll = async () => {
+    const response = await DeleteAllTemplate(selected);
+    handleCloseConfirmAll();
+    setOpen(null);
+    setCount(count + 1);
+  };
 
   return (
     <>
@@ -255,6 +308,8 @@ export default function TemplateForAdminPage() {
             filterName={filterQuery}
             onFilterName={handleFilterByName}
             onDeleteAll={handleDeleteAll}
+            onChildClick={handleChildClick}
+            onCheck={checkStatus}
           />
 
           <Scrollbar>
@@ -275,10 +330,15 @@ export default function TemplateForAdminPage() {
                     return (
                       <TableRow hover key={row.id} tabIndex={-1} role="checkbox" onClick={() => handleRowClick(row.id)}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
+                          <Tooltip title="Check">
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
+                          </Tooltip>
                         </TableCell>
-                        <TableCell align="left">{row.name}</TableCell>
-                        <TableCell align="left">
+
+                        <TableCell align="left" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                          {row.name}
+                        </TableCell>
+                        <TableCell align="left" sx={{ textAlign: 'center' }}>
                           <Slider {...settings} style={{ width: '300px', margin: '0 auto' }}>
                             {row.templateImages.map((image, index) => (
                               <div key={index}>
@@ -290,7 +350,7 @@ export default function TemplateForAdminPage() {
                                     maxHeight: { xs: 233, md: 167 },
                                     maxWidth: { xs: 350, md: 250 },
                                     border: '0.5px thin #000', // Thêm khung đen 2px
-                                    borderRadius: 1, // Bo tròn góc 8px
+                                    borderRadius: '20px', // Bo tròn góc 8px
                                     transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
                                     '&:hover': {
                                       transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
@@ -305,10 +365,16 @@ export default function TemplateForAdminPage() {
                             ))}
                           </Slider>
                         </TableCell>
-                        <TableCell align="left">{row.pricePlusPerOne}</TableCell>
+                        <TableCell align="left" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                          {fCurrency(row.pricePlusPerOne)}
+                        </TableCell>
 
-                        <TableCell align="left">{row.quantityPlus || 0}</TableCell>
-                        <TableCell align="left">{fDateTime(row.createDate)}</TableCell>
+                        <TableCell align="left" sx={{ textAlign: 'center' }}>
+                          {row.quantityPlus || 0}
+                        </TableCell>
+                        <TableCell align="left" sx={{ fontSize: 12.5 }}>
+                          {fDateTime(row.createDate)}
+                        </TableCell>
 
                         <TableCell align="left">
                           <Label color={(row.status === 'banned' && 'error') || 'success'}>
@@ -317,9 +383,11 @@ export default function TemplateForAdminPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
+                          <Tooltip title="Open Menu">
+                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     );
@@ -366,6 +434,22 @@ export default function TemplateForAdminPage() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              backgroundColor: 'whitesmoke',
+              '& .MuiTypography-root': {
+                fontSize: '10px', // or any desired font size
+              },
+              '& .MuiTablePagination-select': {
+                marginRight: '0',
+              },
+              '& .MuiTablePagination-selectIcon': {
+                top: '50%',
+                marginTop: '-12px',
+              },
+              '& .MuiTablePagination-actions': {
+                marginRight: '1.2em',
+              },
+            }}
           />
         </Card>
       </Container>
@@ -385,7 +469,7 @@ export default function TemplateForAdminPage() {
               typography: 'body2',
               borderRadius: 0.75,
             },
-            backgroundColor: 'whitesmoke'
+            backgroundColor: 'whitesmoke',
           },
         }}
       >
@@ -397,10 +481,18 @@ export default function TemplateForAdminPage() {
         </MenuItem>
         <MenuItem sx={{ color: 'edit.main' }}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button variant="outlined" onClick={()=> handleClickEditDialog(idSelected)}>
+          <Button variant="outlined" onClick={() => handleClickEditDialog(idSelected)}>
             Edit Template
           </Button>
         </MenuItem>
+
+        <MenuItem sx={{ color: 'edit.main' }}>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+          <Button variant="outlined" onClick={() => handleAddSize(idSelected)}>
+            Add Size
+          </Button>
+        </MenuItem>
+
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
           <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
@@ -409,7 +501,21 @@ export default function TemplateForAdminPage() {
         </MenuItem>
       </Popover>
       <TemplateDetails openDialog={openDialog} handleCloseDialog={handleCloseDialog} template={templateId} />
-      <EditTemplate openDialog={openDialogEdit} handleCloseDialog={handleCloseDialogEdit} template={templateId}/>
+      <EditTemplate openDialog={openDialogEdit} handleCloseDialog={handleCloseDialogEdit} template={templateId} />
+      <DialogConfirm
+        contentConfirm={'Are you sure you want to delete this item?'}
+        id={idSelected}
+        openDialog={openDialogConfirm}
+        handleCloseDialog={handleCloseConfirm}
+        handleAccept={handleAccept}
+      />
+      <DialogConfirm
+        contentConfirm={'Are you sure you want to delete All items?'}
+        openDialog={openDialogConfirmAll}
+        handleCloseDialog={handleCloseConfirmAll}
+        handleAccept={handleAcceptAll}
+      />
+      <AddSize openDialog={openDialogSize} handleCloseDialog={handleCloseDialogSize} template={templateId} />
     </>
   );
 }

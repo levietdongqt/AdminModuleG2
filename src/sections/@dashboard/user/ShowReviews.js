@@ -24,7 +24,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { useToast } from '@chakra-ui/react';
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // components
 import Label from '../../../components/label';

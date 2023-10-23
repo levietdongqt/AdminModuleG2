@@ -43,21 +43,22 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
         </DialogTitle>
         <CustomDialogContent>
             <div>
+            <Paper>
               <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-                <strong>Name:</strong> ${template.name}
+                <strong>_Name:</strong>{''} ${template.name}
               </Typography>
               <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-                <strong>Price:</strong> ${template.pricePlusPerOne}
+                <strong>_Price:</strong>{''} ${template.pricePlusPerOne}
               </Typography>
               <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-                <strong>Status:</strong> {template.status ? 'In Stock' : 'Out Of Stock'}
+                <strong>_Status:</strong>{''} {template.status ? 'In Stock' : 'Out Of Stock'}
               </Typography>
               <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-            <strong>Quantity:</strong> {template.quantitySold}
+            <strong>_Quantity:</strong>{''} {template.quantitySold}
           </Typography>
           {template.collectionsDTO && template.collectionsDTO.length > 0 && (
             <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-              <strong>Collections:</strong>{' '}
+              <strong>_Collections:</strong>{' '}
               {template.collectionsDTO.map((element, index) => {
                 return index === 0 ? element.name : `, ${element.name}`;
               })}
@@ -66,23 +67,23 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
 
           {template.sizesDTO && template.sizesDTO.length > 0 && (
             <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-              <strong>Sizes:</strong>{' '}
+              <strong>_Sizes:</strong>{' '}
               {template.sizesDTO.map((element, index) => {
                 return index === 0 ? `${element.width}x${element.length}` : `, ${element.width}x${element.length}`;
               })}
             </Typography>
           )}
           <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-            <strong>Totals Reviews:</strong>
+            <strong>_Totals Reviews:</strong>
             {template.reviews && template.reviews.length > 0 ? template.reviews.length : 0}
           </Typography>
 
           <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-            <strong>CreatedDate:</strong> {fDateTime(template.createDate)}
+            <strong>_CreatedDate:</strong> {fDateTime(template.createDate)}
           </Typography>
 
           <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-            <strong>Description:</strong>
+            <strong>_Description:</strong>
           </Typography>
           {template.descriptionTemplates &&
             template.descriptionTemplates.length > 0 &&
@@ -90,6 +91,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
               const i = index + 1;
               return (
                 <>
+                <Paper key={index}>
                   <Typography variant="body1" style={{ marginLeft: '20px' }} color={'GrayText'} >
                     <strong>{`+Title ${i}:`}</strong> {ele.title}
                   </Typography>
@@ -97,27 +99,29 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
                     <strong>{`+Description ${i}`}:</strong>
                     <div style={{ marginLeft: '20px' }} dangerouslySetInnerHTML={{ __html: ele.description }} />
                   </Typography>
+                  </Paper>
                 </>
               );
             })}
           <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
-            <strong>Image:</strong>
+            <strong>_Image:</strong>
           </Typography>
           {template.templateImages && template.templateImages.length > 0 && (
             <Grid container spacing={2}>
               {template.templateImages.map((image, index) => (
-                <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                <Grid item key={index} xs={12} sm={6} md={6} lg={4}>
                   <Paper elevation={3}>
                     <Box
                       component="img"
                       sx={{
-                        height: 300,
+                        height: 'auto',
                         width: 500,
                         maxHeight: { xs: 233, md: 167 },
                         maxWidth: { xs: 350, md: 250 },
                         border: '0.5px thin #000', // Thêm khung đen 2px
                         borderRadius: 1, // Bo tròn góc 8px
-                        transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
+                        transition: 'transform 0.3s',
+                         
                         '&:hover': {
                           transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
                           boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
@@ -131,6 +135,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
               ))}
             </Grid>
           )}
+          </Paper>
             </div>    
         </CustomDialogContent>
         <DialogActions>

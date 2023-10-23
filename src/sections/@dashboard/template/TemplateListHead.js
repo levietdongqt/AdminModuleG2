@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
+import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel,Tooltip } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -43,18 +43,23 @@ export default function TemplateListHead({
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
+        <Tooltip title='Check All'>
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
           />
+          </Tooltip>
         </TableCell>
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.alignRight ? 'right' : 'left'}
             sortDirection={orderBy === headCell.id ? order : false}
+            sx={{fontWeight:'bold',textAlign:'center'}}
+            
           >
+            <Tooltip title={order === 'desc' ? 'Descending' : 'Ascending'}>
             <TableSortLabel
               hideSortIcon
               active={orderBy === headCell.id}
@@ -66,6 +71,7 @@ export default function TemplateListHead({
                 <Box sx={{ ...visuallyHidden }}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</Box>
               ) : null}
             </TableSortLabel>
+            </Tooltip>
           </TableCell>
         ))}
       </TableRow>

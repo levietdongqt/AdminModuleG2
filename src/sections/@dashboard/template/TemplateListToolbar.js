@@ -38,16 +38,12 @@ TemplateListToolbar.propTypes = {
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   onDeleteAll: PropTypes.func,
+  onChildClick: PropTypes.func,
+  onCheck:PropTypes.bool
 };
 
-export default function TemplateListToolbar({ numSelected, filterName, onFilterName,onDeleteAll }) {
-  const [open, setOpen] = useState(null);
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+export default function TemplateListToolbar({ numSelected, filterName, onFilterName,onDeleteAll,onChildClick,onCheck }) {
+
 
   
   return (
@@ -84,47 +80,14 @@ export default function TemplateListToolbar({ numSelected, filterName, onFilterN
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-            <Iconify icon="ic:round-filter-list" />
+        <Tooltip title={onCheck ? "Show banned" : "Show Active"}>
+          <IconButton size="large" color="inherit" onClick={() => onChildClick()}>
+            <Iconify icon="eos-icons:arrow-rotate" />
           </IconButton>
         </Tooltip>       
       )}
     </StyledRoot>
-    <Popover
-    open={Boolean(open)}
-    anchorEl={open}
-    onClose={handleCloseMenu}
-    anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-    PaperProps={{
-      sx: {
-        p: 1,
-        width: 200,
-        height:400,
-        opacity:1,
-        '& .MuiMenuItem-root': {
-          px: 1,
-          typography: 'body2',
-          borderRadius: 0.75,
-        },
-      },
-    }}
-  >
-    <MenuItem>
-      <Iconify icon={'eva:edit-fill'}/>
-      <Button variant="contained">
-       PricePlus
-      </Button>
-    </MenuItem>
-
-    <MenuItem sx={{ color: 'error.main' }}>
-      <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-      <Button variant="contained">
-        Create Date
-      </Button>
-    </MenuItem>
-  </Popover>
+    
   </>
   );
 }

@@ -1,15 +1,15 @@
 import axios, { AxiosError } from "axios";
 import  baseRequest  from '../contexts/AxiosContext';
 
-export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortBy,isAscending){
+export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortBy,isAscending,status){
     let response;
     try{       
         const useDefaultSort = sortBy === 'name' && isAscending === true;
         const sortField = useDefaultSort ? 'name' : sortBy;
         if(sortField === 'name'){
-            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, useDefaultSort);
+            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, useDefaultSort,status);
         }else{
-            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, isAscending);
+            response = await GetAllTemplateAsync(page, dataPerPage, filterOn, filterQuery, sortField, isAscending,status);
         }       
         return response;
     }catch(error){
@@ -17,8 +17,8 @@ export async function GetAllTemplate(page,dataPerPage,filterOn,filterQuery,sortB
     }
 }
 
-const GetAllTemplateAsync = async (page,dataPerPage,filterOn,filterQuery,sortBy,isAscending)=> {
-    const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Template?filterOn=${filterOn}&filterQuery=${filterQuery}&sortBy=${sortBy}&isAscending=${isAscending}&pageNumber=${page}&pageSize=${dataPerPage}`)
+const GetAllTemplateAsync = async (page,dataPerPage,filterOn,filterQuery,sortBy,isAscending,status)=> {
+    const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Template?filterOn=${filterOn}&filterQuery=${filterQuery}&sortBy=${sortBy}&isAscending=${isAscending}&status=${status}&pageNumber=${page}&pageSize=${dataPerPage}`)
     return response;
 }
 
@@ -88,6 +88,15 @@ export async function UpdateTemplate(id,formData){
                 'Content-Type' : 'multipart/form-data',
             },
         });
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}
+
+export async function AddSizeAsync(id,data){
+    try{
+        const response = await baseRequest.post(`${process.env.REACT_APP_API_BASE_URL}/Template/${id}/AddSize`,data);
         return response;
     }catch(error){
         return error.response;
