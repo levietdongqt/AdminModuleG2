@@ -10,7 +10,7 @@ import Page404 from './pages/Page404';
 import DashboardAppPage from './pages/DashboardAppPage';
 import TemplateForAdminPage from './pages/TemplateForAdminPage';
 import CreateTemplatePage from './pages/CreateTemplatePage';
-
+import PurchaseOderPage from './pages/PurchaseOderPage';
 
 import LoginPage from './pages/LoginPage';
 // ----------------------------------------------------------------------
@@ -26,7 +26,8 @@ export default function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'template', element: <TemplateForAdminPage /> },
         { path: 'template', element: <TemplateForAdminPage /> },
-        { path: 'create', element: <CreateTemplatePage/>},
+        { path: 'create', element: <CreateTemplatePage /> },
+        { path: 'purchase', element: <PurchaseOderPage /> },
       ],
     },
     {

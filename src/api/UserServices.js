@@ -1,13 +1,13 @@
 import axios from "axios";
-import  baseRequest  from '../contexts/AxiosContext';
+import baseRequest from '../contexts/AxiosContext';
 
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
-    let response; 
-    if(search !== null){
+    let response;
+    if (search !== null) {
       response = await baseRequest.get(
         `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?search=${search}&&page=${page}&&pageSize=${pageSize}`)
-    }else{
+    } else {
       response = await baseRequest.get(
         `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?page=${page}&&pageSize=${pageSize}`)
     }
@@ -26,16 +26,19 @@ export const getUserById = async (id) => {
   return data;
 };
 
-export const updateUser = async (userDTO) => {
-    const response = await baseRequest.put(
-      `${process.env.REACT_APP_API_BASE_URL}/User/Edit`,
-      userDTO // Truyền dữ liệu cần cập nhật từ userDTO
-    );
+export const updateUser = async (formdata) => {
+  const response = await baseRequest.put(
+    `${process.env.REACT_APP_API_BASE_URL}/User/Edit`,
+    formdata, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
-    
-      // Xử lý nếu API trả về mã 200 OK
-      return response;     // Xử lý nếu có lỗi
-  
+
+  // Xử lý nếu API trả về mã 200 OK
+  return response;     // Xử lý nếu có lỗi
+
 };
 
 export const changePassword = async (userDTO) => {
@@ -68,7 +71,7 @@ export const deleteFavorite = async (id, productId) => {
   return data;
 };
 
-export const TotalUsersInMonth = async () =>{
+export const TotalUsersInMonth = async () => {
   const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/user/Total`);
   return response;
 }
