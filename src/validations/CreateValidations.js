@@ -5,7 +5,7 @@ const ValidationSchemaMap = yup.object({
       .string('Enter name')
       .required('Username is required')
       .min(3, 'Template name is must have greater than 3 letter'),
-    pricePlus: yup
+    pricePlusPerOne: yup
       .number('Enter price plus')
       .required('Price Plus is required')
       .min(0, 'Price Plus must be greater than 0')

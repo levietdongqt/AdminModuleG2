@@ -88,7 +88,7 @@ export default function DashboardAppPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Purchase Created" total={dataAdmin.po} icon={"carbon:purchase"} />
+            <AppWidgetSummary title="Weekly Purchase Created" total={(dataAdmin.po > 0 ) ? dataAdmin.po : '0' } icon={"carbon:purchase"} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
@@ -96,7 +96,7 @@ export default function DashboardAppPage() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Quantity Sales" total={dataAdmin.pd} color="warning" icon={"material-symbols:production-quantity-limits"}/>
+            <AppWidgetSummary title="Weekly Quantity Sales" total={(dataAdmin.pd > 0) ? dataAdmin.pd : '0'} color="warning" icon={"material-symbols:production-quantity-limits"}/>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>

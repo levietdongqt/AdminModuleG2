@@ -30,7 +30,7 @@ const Login = () => {
         duration: 2000,
         isClosable: true
       });
-      navigate('/app');
+      navigate('app');
       if (remember && result.data.role === 'admin') {
         setCookie('currentUser', result.data.result, { path: '/app' });
         setTokenCookie('accessToken',result.data.token,{ path: '/app' })
