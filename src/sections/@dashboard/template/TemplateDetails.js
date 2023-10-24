@@ -35,6 +35,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
             width: 1000, // thay đổi độ rộng cố định theo ý muốn của bạn
             height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+            letterSpacing:"0.05em"
           },
         }}
       >
@@ -43,7 +44,6 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
         </DialogTitle>
         <CustomDialogContent>
             <div>
-            <Paper>
               <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
                 <strong>_Name:</strong>{''} ${template.name}
               </Typography>
@@ -91,7 +91,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
               const i = index + 1;
               return (
                 <>
-                <Paper key={index}>
+                <Box key={index}>
                   <Typography variant="body1" style={{ marginLeft: '20px' }} color={'GrayText'} >
                     <strong>{`+Title ${i}:`}</strong> {ele.title}
                   </Typography>
@@ -99,7 +99,7 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
                     <strong>{`+Description ${i}`}:</strong>
                     <div style={{ marginLeft: '20px' }} dangerouslySetInnerHTML={{ __html: ele.description }} />
                   </Typography>
-                  </Paper>
+                  </Box>
                 </>
               );
             })}
@@ -110,7 +110,6 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
             <Grid container spacing={2}>
               {template.templateImages.map((image, index) => (
                 <Grid item key={index} xs={12} sm={6} md={6} lg={4}>
-                  <Paper elevation={3}>
                     <Box
                       component="img"
                       sx={{
@@ -130,12 +129,10 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
                       alt={`Image ${index}`}
                       src={`${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`}
                     />
-                  </Paper>
                 </Grid>
               ))}
             </Grid>
           )}
-          </Paper>
             </div>    
         </CustomDialogContent>
         <DialogActions>

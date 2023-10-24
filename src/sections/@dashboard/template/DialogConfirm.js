@@ -10,7 +10,7 @@ import { DeleteTemplate } from '../../../api/TemplateService';
 
 export default function DialogConfirm({contentConfirm,id,openDialog,handleCloseDialog,handleAccept}){   
     return(
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <Dialog open={openDialog} onClose={handleCloseDialog} sx={{letterSpacing:"0.05em"}}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ImageUploading from 'react-images-uploading';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { styled } from '@mui/material/styles';
 import JoditEditor from 'jodit-react';
-
 
 import {
   IconButton,
@@ -25,15 +25,21 @@ import {
   Box,
   Paper,
   Alert,
+  Tooltip,
 } from '@mui/material';
 import { useToast } from '@chakra-ui/react';
+
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import { LoadingButton } from '@mui/lab';
-import  ValidationSchemaMap from '../validations/CreateValidations'
+import Iconify from '../components/iconify';
+
+import ValidationSchemaMap from '../validations/CreateValidations';
 import { GetAllCategories, GetAllSizes, AddTemplate } from '../api/TemplateService';
 
 const VisuallyHiddenInput = styled('input')({
@@ -48,8 +54,6 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-
-
 export default function CreateTemplatePage() {
   const toast = useToast();
   const navigate = useNavigate();
@@ -58,7 +62,7 @@ export default function CreateTemplatePage() {
   const [categorySelected, setCategorySelected] = useState({});
   const [categories, setCategories] = useState([]);
   const [sizes, setSizes] = useState([]);
-
+  const [maxNumber, setMaxNumber] = useState(15);
   const [open, setOpen] = useState({});
   const [collectionsSelectedItems, setCollectionsSelectedItems] = useState([]);
 
@@ -76,6 +80,7 @@ export default function CreateTemplatePage() {
     },
     validationSchema: ValidationSchemaMap,
     onSubmit: async (values) => {
+      console.log(fileList);
       const formData = new FormData();
       formData.append('Name', values.name);
       formData.append('PricePlusPerOne', values.pricePlusPerOne);
@@ -92,12 +97,12 @@ export default function CreateTemplatePage() {
         formData.append(`sizeDTOs[${index}].CreateDate`, item.createDate);
       });
       fileList.forEach((item, index) => {
-        formData.append(`formFileList`, item);
+        formData.append(`formFileList`, item.file);
       });
 
       const response = await AddTemplate(formData);
       console.log(response);
-      if (response.data.status === 201) {   
+      if (response.data.status === 201) {
         toast({
           title: 'Create',
           description: 'You have created successfully.',
@@ -105,7 +110,7 @@ export default function CreateTemplatePage() {
           duration: 2000,
           isClosable: true,
         });
-        navigate("/template")    
+        navigate('/template');
       } else {
         toast({
           title: 'Error!',
@@ -117,25 +122,6 @@ export default function CreateTemplatePage() {
       }
     },
   });
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0]; // Lấy ra tệp ảnh từ sự kiện tải lên
-    const updatedSelectedFiles = [...fileList];
-    updatedSelectedFiles.push(file);
-    setFileList(updatedSelectedFiles);
-    const reader = new FileReader();
-    // Xử lý khi tệp ảnh đã được đọc
-    reader.onload = () => {
-      const imageUrl = reader.result; // Đường dẫn ảnh đã được đọc
-      // Cập nhật state với hình ảnh mới
-      setImages([...images, { imageUrl }]);
-    };
-
-    if (file) {
-      reader.readAsDataURL(file); // Đọc tệp ảnh dưới dạng base64
-    }
-    console.log(images);
-  };
 
   useEffect(() => {
     GetAllCategoriesAndSize();
@@ -175,7 +161,9 @@ export default function CreateTemplatePage() {
     const updatedItems = collectionsSelectedItems.filter((item) => item !== selectedItem);
     setCollectionsSelectedItems(updatedItems);
   };
-
+  const onChange = (imageList) => {
+    setFileList(imageList);
+  };
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -310,53 +298,93 @@ export default function CreateTemplatePage() {
           <Alert severity="error">{formik.errors.description}</Alert>
         ) : null}
         <InputLabel id="demo-simple-select-label">Upload file</InputLabel>
-        <Button
-          component="label"
-          variant="contained"
-          startIcon={<CloudUploadIcon />}
-          color="primary"
-          sx={{
-            // Tùy chỉnh CSS cho nút
-            backgroundColor: '#ff5722', // Thay đổi màu nền theo ý muốn
-            color: 'white', // Thay đổi màu chữ theo ý muốn
-            borderRadius: '4px', // Bo tròn góc
-            '&:hover': {
-              backgroundColor: '#e64a19', // Màu nền khi di chuột qua
-            },
-          }}
-        >
-          Upload file
-          <VisuallyHiddenInput type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-        </Button>
-        {images.length === 0 ? <Alert severity="error">{'Must be choose in here'}</Alert> : null}
-        <Grid container spacing={2}>
-          {images.map((image, index) => {
-            return (
-              <Grid item key={index}>
-                <Box
-                  component="img"
-                  sx={{
-                    height: 100,
-                    width: 200,
-                    maxHeight: { xs: 233, md: 167 },
-                    maxWidth: { xs: 350, md: 250 },
-                    border: '0.5px thin #000', // Thêm khung đen 2px
-                    borderRadius: 1, // Bo tròn góc 8px
-                    transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
-                    '&:hover': {
-                      transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
-                      boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
-                    },
-                  }}
-                  alt={`Image ${index}`}
-                  src={image.imageUrl}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
       </Stack>
-      <LoadingButton fullWidth size="large" type="submit" variant="contained" >
+      <Box sx={{alignItems:'center'}}>
+      <ImageUploading
+        multiple
+        value={fileList}
+        onChange={onChange}
+        maxNumber={maxNumber}
+        dataURLKey="data_url"
+        acceptType={['jpg', 'jpeg', 'png']}
+      >
+        {({
+          imageList,
+          onImageUpload,
+          onImageRemoveAll,
+          onImageUpdate,
+          onImageRemove,
+          isDragging,
+          dragProps,
+          errors,
+        }) => (
+          // write your building UI
+          <div className="upload__image-wrapper">
+            <Box>
+            <Tooltip title="Upload">
+              <Button onClick={(event) => onImageUpload(event)} sx={{ height: 'auto'}} >
+                <UploadFileIcon sx={{ fontSize: 50 }} />
+              </Button>
+            </Tooltip>    
+            &nbsp;
+            <Tooltip title="Remove">
+              <Button onClick={(event) => onImageRemoveAll(event)} sx={{color:'red'}}>
+                <DeleteSweepIcon sx={{ fontSize: 50 }} />
+              </Button>
+            </Tooltip>
+            </Box>
+            {imageList.length === 0 ? <Alert severity="error">{'Must be choose in here'}</Alert> : null}
+            <Grid container spacing={2}>
+              {imageList.map((image, index) => {
+                return (
+                  <Grid item key={index}>
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 100,
+                        width: 200,
+                        maxHeight: { xs: 233, md: 167 },
+                        maxWidth: { xs: 350, md: 250 },
+                        border: '0.5px thin #000', // Thêm khung đen 2px
+                        borderRadius: 1, // Bo tròn góc 8px
+                        transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
+                        '&:hover': {
+                          transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
+                          boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
+                        },
+                      }}
+                      alt={`Image ${index}`}
+                      src={image.data_url}
+                    />
+                    <div className="image-item__btn-wrapper">
+                      <Tooltip title="Change">
+                        <IconButton onClick={(event) => onImageUpdate(index)}>
+                          <PublishedWithChangesIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Remove">
+                        <IconButton onClick={(event) => onImageRemove(index)}>
+                          <DeleteIcon sx={{ fontSize: 20 }} color="error" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            {errors && (
+              <div>
+                {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
+                {errors.acceptType && <span>Your selected file type is not allow</span>}
+                {errors.maxFileSize && <span>Selected file size exceed maxFileSize</span>}
+                {errors.resolution && <span>Selected file is not match your desired resolution</span>}
+              </div>
+            )}
+          </div>
+        )}
+      </ImageUploading>
+      </Box>
+      <LoadingButton fullWidth size="large" type="submit" variant="contained">
         Add Template
       </LoadingButton>
     </form>
