@@ -8,23 +8,23 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { DeleteTemplate } from '../../../api/TemplateService';
 
-export default function DialogConfirm({contentConfirm,id,openDialog,handleCloseDialog,handleAccept}){   
-    return(
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {contentConfirm}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => handleAccept()} color="secondary" autoFocus>
-            Accept
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
+export default function DialogConfirm({ contentConfirm, id, openDialog, handleCloseDialog, handleAccept }) {
+  return (
+    <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <DialogTitle>Confirm Actions</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          {contentConfirm}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseDialog} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={() => handleAccept()} color="secondary" autoFocus>
+          Accept
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 }

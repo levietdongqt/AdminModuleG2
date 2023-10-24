@@ -31,6 +31,7 @@ import { ShowReviews, ShowFeedBack, UserListHead, UserListToolbar, UserDetails }
 // mock
 
 import { getAllUsers, getUserById, updateUser } from '../api/UserServices'
+import { DialogConfirm } from '../sections/@dashboard/template'
 
 
 // ----------------------------------------------------------------------
@@ -103,8 +104,13 @@ export default function UserPage() {
   const [openDialogReview, setOpenDialogReview] = useState(false);
   const [openDialogFeedBack, setOpenDialogFeedBack] = useState(false);
   const [openDialogDetails, setOpenDialogDetails] = useState(false);
+  const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
+
   const [user, setUser] = useState({});
   const [checkUpdate, setCheckUpdate] = useState(0);
+  const [statusOptions, setStatusOptions] = useState('');
+
+
 
   useEffect(() => {
     GetAllUserAsync(search, true, 1, 1000);
@@ -172,28 +178,36 @@ export default function UserPage() {
   };
 
 
-  const handleDelete = async (idSelected) => {
-    const confirmCancel = window.confirm('Are you sure you want to perform this operation?');
-    if (!confirmCancel) return;
+  const handleDelete = async () => {
+    setOpenDialogConfirm(false);
+    setOpen(null);
     const data = await getUserById(idSelected);
     const formData = new FormData();
-    if (data.result.status === "Enabled") {
-      formData.append("status", "Disabled");
-    } else if (data.result.status === "Disabled") {
-      formData.append("status", "Enabled");
-    }
+    formData.append("status", statusOptions);
     Object.keys(data.result).forEach((key) => {
       formData.append(key, data.result[key]);
     });
 
     const response = await updateUser(formData);
+    console.log(response)
     setCheckUpdate(checkUpdate + 1);
   };
 
 
 
-  const handleRowClick = (id) => {
+  const handleRowClick = async (id) => {
     setIdSelected(id);
+    const data = await getUserById(id);
+    console.log(data.FullName)
+    if (data.result.status === "Pending") {
+      setStatusOptions("Disabled")
+    }
+    if (data.result.status === "Disabled") {
+      setStatusOptions("Enabled")
+    }
+    if (data.result.status === "Enabled") {
+      setStatusOptions("Disabled")
+    }
   }
 
   const handleClickReviewDialog = async (id) => {
@@ -224,6 +238,15 @@ export default function UserPage() {
     setOpenDialogDetails(false);
   }
 
+
+
+  const handleCloseDialogConfirm = () => {
+    setOpenDialogConfirm(false);
+  }
+
+  const handleOpenDialogConfirm = () => {
+    setOpenDialogConfirm(true);
+  }
 
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
@@ -372,10 +395,21 @@ export default function UserPage() {
           </Button>
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        {/* <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
+          <Button variant="outlined" onClick={() => handleOpenDialogConfirm()}>
             Delete
+          </Button>
+        </MenuItem> */}
+
+        <MenuItem>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => handleOpenDialogConfirm()}
+          >
+            {statusOptions}
           </Button>
         </MenuItem>
 
@@ -398,6 +432,8 @@ export default function UserPage() {
       <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user} />
       <ShowFeedBack openDialog={openDialogFeedBack} handleCloseDialog={handleCloseDialogFeedBack} user={user} />
       <UserDetails openDialog={openDialogDetails} handleCloseDialog={handleCloseDialogDetails} user={user} />
+      <DialogConfirm openDialog={openDialogConfirm} contentConfirm="Are you sure you want to perform this operation?"
+        handleCloseDialog={handleCloseDialogConfirm} handleAccept={handleDelete} />
     </>
   );
 }
