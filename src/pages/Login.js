@@ -3,24 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { styled } from '@mui/material/styles';
 import { Box, FormControl, FormLabel, InputGroup, Input, Text, InputRightElement, Button, Checkbox, useToast } from '@chakra-ui/react';
-import { Stack,TextField,InputLabel } from '@mui/material';
+import { Stack, TextField, InputLabel } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import { useFormik } from 'formik';
 import bcrypt  from 'bcryptjs/dist/bcrypt';
 import { useUserContext } from '../contexts/UserContext';
 import LoginValidations from '../validations/LoginValidations';
-import { Login as LogIn} from '../api/AuthServices';
+import { Login as LogIn } from '../api/AuthServices';
 
 const Login = () => {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(false);
-  const {setCurrentUser,setToken } = useUserContext();
+  const { setCurrentUser, setToken } = useUserContext();
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
   const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['accessToken']);
   const navigate = useNavigate();
   const toast = useToast();
-  const handldeResponse = (result,remember) => {
+  const handldeResponse = (result, remember) => {
     if (result.data.status === 200 && result.data.role === 'admin') {
       setCurrentUser(result.data.result);
       setToken(result.data.token);
@@ -34,10 +34,10 @@ const Login = () => {
       navigate('app');
       if (remember && result.data.role === 'admin') {
         setCookie('currentUser', result.data.result, { path: '/app' });
-        setTokenCookie('accessToken',result.data.token,{ path: '/app' })
+        setTokenCookie('accessToken', result.data.token, { path: '/app' })
       } else {
-        setCookie('currentUser', result.data.result, { path: 'app',expires:0 });
-        setTokenCookie('accessToken',result.data.token,{ path: 'app',expires:0 })
+        setCookie('currentUser', result.data.result, { path: '/app',expires:0 });
+        setTokenCookie('accessToken',result.data.token,{ path: '/app',expires:0 })
       };
     } else {
       resetForm();
@@ -57,16 +57,15 @@ const Login = () => {
       email: '',
       password: ''
     },
-    onSubmit: (values) => {
-      // console.log(hashedPassword);
+    onSubmit: values => {
       LogIn(values.email, values.password)
         .then((result) => {
-          handldeResponse(result,remember);
+          handldeResponse(result, remember);
         });
     },
     validationSchema: LoginValidations
   });
-  
+
   return (
     <Stack
       display='flex'

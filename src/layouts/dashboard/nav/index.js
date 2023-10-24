@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Avatar, Stack, Card, CardMedia } from '@mui/material';
 // mock
 import { useUserContext } from '../../../contexts/UserContext';
 // hooks
@@ -54,6 +54,13 @@ export default function Nav({ openNav, onCloseNav }) {
       }}
     >
       <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
+        {/* <CardMedia
+          component="img"
+          alt="Your Image"
+          image={`${process.env.REACT_APP_API_BASE_IMAGE}/Avatar/LOGOIMAGE.png`}
+          style={{ border: 'none' }}
+        /> */}
+
         <Logo />
       </Box>
 

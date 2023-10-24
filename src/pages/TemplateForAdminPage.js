@@ -297,7 +297,7 @@ export default function TemplateForAdminPage() {
           <Typography variant="h4" gutterBottom color={'Highlight'} sx={{letterSpacing:"0.05em"}}>
           Template Management
           </Typography>
-          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} href="template/create" color="secondary" sx={{letterSpacing:"0.05em"}}>
+          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} href="/template/create" color="secondary" sx={{letterSpacing:"0.05em"}}>
             NEW TEMPLATE
           </Button>
         </Stack>

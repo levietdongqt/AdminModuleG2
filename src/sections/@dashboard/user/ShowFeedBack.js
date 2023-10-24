@@ -27,6 +27,7 @@ import { useToast } from '@chakra-ui/react';
 import JoditEditor from 'jodit-react';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';

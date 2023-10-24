@@ -5,6 +5,7 @@ import DashboardLayout from './layouts/dashboard';
 import UserPage from './pages/UserPage';
 import Page404 from './pages/Page404';
 
+import PurchaseOderPage from './pages/PurchaseOderPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import TemplateForAdminPage from './pages/TemplateForAdminPage';
 import CreateTemplatePage from './pages/CreateTemplatePage';
@@ -28,9 +29,11 @@ export default function Router2() {
           <Route path="app" element={<DashboardAppPage />} />
           <Route path="user" element={<UserPage />} />
           <Route path="template" element={<TemplateForAdminPage />} />
+          <Route path="purchase" element={<PurchaseOderPage />} />
           <Route path="template/create" element={<CreateTemplatePage />} />
           <Route index element={<Navigate to="/app" />} />
         </Route>
+
         <Route path="login" element={<LoginPage />} />
         <Route path="404" element={<Page404 />} />
         <Route path="403" element={<Page403 />} />

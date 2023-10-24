@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import {
   Card,
@@ -27,10 +27,11 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { ShowReviews,ShowFeedBack, UserListHead, UserListToolbar, UserDetails } from '../sections/@dashboard/user';
+import { ShowReviews, ShowFeedBack, UserListHead, UserListToolbar, UserDetails } from '../sections/@dashboard/user';
 // mock
 
-import {getAllUsers,getUserById,updateUser} from '../api/UserServices'
+import { getAllUsers, getUserById, updateUser } from '../api/UserServices'
+import { DialogConfirm } from '../sections/@dashboard/template'
 
 
 // ----------------------------------------------------------------------
@@ -91,32 +92,40 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [users,setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  const [search,setSearch] = useState('');
+  const [search, setSearch] = useState('');
 
-  const [st,setSt] = useState(true);
+  const [st, setSt] = useState(true);
 
   const [idSelected, setIdSelected] = useState(null);
 
-  const [openDialogReview,setOpenDialogReview] = useState(false);
-  const [openDialogFeedBack,setOpenDialogFeedBack] = useState(false);
-  const [openDialogDetails,setOpenDialogDetails] = useState(false);
-  const [user,setUser] = useState({});
+
+  const [openDialogReview, setOpenDialogReview] = useState(false);
+  const [openDialogFeedBack, setOpenDialogFeedBack] = useState(false);
+  const [openDialogDetails, setOpenDialogDetails] = useState(false);
+  const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
+
+  const [user, setUser] = useState({});
+  const [checkUpdate, setCheckUpdate] = useState(0);
+  const [statusOptions, setStatusOptions] = useState('');
+
+
 
   useEffect(() => {
-    GetAllUserAsync(search,true,1,1000);
-  }, [search,st]);
+    GetAllUserAsync(search, true, 1, 1000);
 
-  const GetAllUserAsync = async (search,st,page,pageSize) => {
-    const response = await getAllUsers(search,st,page,pageSize);
+  }, [search, st, checkUpdate]);
+
+  const GetAllUserAsync = async (search, st, page, pageSize) => {
+    const response = await getAllUsers(search, st, page, pageSize);
 
     console.log(response);
 
     setUsers(response.data.result);
   };
 
-  const handleFilterByEmailOrPhone = (event)=>{
+  const handleFilterByEmailOrPhone = (event) => {
     setSearch(event.target.value);
   }
 
@@ -142,6 +151,7 @@ export default function UserPage() {
     }
     setSelected([]);
   };
+
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     console.log(selectedIndex);
@@ -168,19 +178,36 @@ export default function UserPage() {
   };
 
 
-  const handleDelete = async (idSelected) =>{
+  const handleDelete = async () => {
+    setOpenDialogConfirm(false);
+    setOpen(null);
     const data = await getUserById(idSelected);
-    data.result.status = "Disabled";
-    console.log(data);
+    const formData = new FormData();
+    formData.append("status", statusOptions);
+    Object.keys(data.result).forEach((key) => {
+      formData.append(key, data.result[key]);
+    });
 
-    const response = await updateUser(data);
-    console.log(response);
-
-
+    const response = await updateUser(formData);
+    console.log(response)
+    setCheckUpdate(checkUpdate + 1);
   };
 
-  const handleRowClick = (id) =>{
+
+
+  const handleRowClick = async (id) => {
     setIdSelected(id);
+    const data = await getUserById(id);
+    console.log(data.FullName)
+    if (data.result.status === "Pending") {
+      setStatusOptions("Disabled")
+    }
+    if (data.result.status === "Disabled") {
+      setStatusOptions("Enabled")
+    }
+    if (data.result.status === "Enabled") {
+      setStatusOptions("Disabled")
+    }
   }
 
   const handleClickReviewDialog = async (id) => {
@@ -192,7 +219,7 @@ export default function UserPage() {
     setOpenDialogReview(false);
   }
 
-  const handleClickFeedBackDialog = async (id) =>{
+  const handleClickFeedBackDialog = async (id) => {
     const data = await getUserById(id);
     setUser(data.result);
     setOpenDialogFeedBack(true);
@@ -201,7 +228,7 @@ export default function UserPage() {
     setOpenDialogFeedBack(false);
   }
 
-  const handleDetails = async (id) =>{
+  const handleDetails = async (id) => {
     const data = await getUserById(id);
     setUser(data.result);
     setOpenDialogDetails(true);
@@ -211,13 +238,23 @@ export default function UserPage() {
     setOpenDialogDetails(false);
   }
 
-  
+
+
+  const handleCloseDialogConfirm = () => {
+    setOpenDialogConfirm(false);
+  }
+
+  const handleOpenDialogConfirm = () => {
+    setOpenDialogConfirm(true);
+  }
+
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
   const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+
 
   return (
     <>
@@ -252,7 +289,7 @@ export default function UserPage() {
                     const selectedUser = selected.indexOf(row.id) !== -1;
 
                     return (
-                      <TableRow hover key={row.id} tabIndex={-1} role="checkbox"  onClick={() => handleRowClick(row.id)}>
+                      <TableRow hover key={row.id} tabIndex={-1} role="checkbox" onClick={() => handleRowClick(row.id)}>
                         <TableCell padding="checkbox">
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
                         </TableCell>
@@ -275,7 +312,7 @@ export default function UserPage() {
                         <TableCell align="left">{row.emailConfirmed ? 'Yes' : 'No'}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(row.status === 'banned' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
+                          <Label color={(row.status === 'Disabled' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
                         </TableCell>
 
                         <TableCell align="right">
@@ -358,31 +395,45 @@ export default function UserPage() {
           </Button>
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        {/* <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-          <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
+          <Button variant="outlined" onClick={() => handleOpenDialogConfirm()}>
             Delete
           </Button>
+        </MenuItem> */}
+
+        <MenuItem>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => handleOpenDialogConfirm()}
+          >
+            {statusOptions}
+          </Button>
         </MenuItem>
+
 
         <MenuItem sx={{ color: 'info.main' }}>
           <Iconify icon={'octicon:code-review-24'} sx={{ mr: 1 }} />
-          
+
           <Button variant="outlined" onClick={() => handleClickReviewDialog(idSelected)}>
-          Show Review
+            Show Review
           </Button>
         </MenuItem>
 
         <MenuItem sx={{ color: 'info.main' }}>
-          <Iconify icon={'codicon:feedback'} sx={{ mr: 1 }} />        
+          <Iconify icon={'codicon:feedback'} sx={{ mr: 1 }} />
           <Button variant="outlined" onClick={() => handleClickFeedBackDialog(idSelected)}>
-          Show FeedBack
+            Show FeedBack
           </Button>
         </MenuItem>
       </Popover>
-      <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user}/>
-      <ShowFeedBack openDialog={openDialogFeedBack} handleCloseDialog={handleCloseDialogFeedBack} user={user}/>
-      <UserDetails openDialog={openDialogDetails} handleCloseDialog={handleCloseDialogDetails} user={user}/>
+      <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user} />
+      <ShowFeedBack openDialog={openDialogFeedBack} handleCloseDialog={handleCloseDialogFeedBack} user={user} />
+      <UserDetails openDialog={openDialogDetails} handleCloseDialog={handleCloseDialogDetails} user={user} />
+      <DialogConfirm openDialog={openDialogConfirm} contentConfirm="Are you sure you want to perform this operation?"
+        handleCloseDialog={handleCloseDialogConfirm} handleAccept={handleDelete} />
     </>
   );
 }
