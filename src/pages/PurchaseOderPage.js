@@ -34,11 +34,11 @@ import Scrollbar from '../components/scrollbar';
 // mock
 import { fDate } from '../utils/formatTime';
 
-import { ShowReviews, ShowFeedBack, UserListHead, UserListToolbar, PurchaseDeliveryInfo } from '../sections/@dashboard/user';
+import { ShowReviews, ShowFeedBack, PurchaseListHead, UserListToolbar, PurchaseDeliveryInfo } from '../sections/@dashboard/user';
 
 
-import { getAllPurchase, getDeliveryById, getPurchaseById, getPurchasesByStatus, updatePurchaseStatus } from '../api/PurchaseServices';
-
+import { getAllPurchase, getDeliveryById, getPurchaseById, getPurchasesByStatus, updatePurchaseStatus, deleteFolder } from '../api/PurchaseServices';
+import { DialogConfirm } from '../sections/@dashboard/template'
 
 // TABLE HEAD
 const TABLE_HEAD = [
@@ -99,16 +99,11 @@ export default function PurchaseOderPage() {
     const [openDialogReview, setOpenDialogReview] = useState(false);
     const [openDialogFeedBack, setOpenDialogFeedBack] = useState(false);
     const [openDialogDetails, setOpenDialogDetails] = useState(false);
+
+    const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
     const [deli, setDeli] = useState({});
-    const statusOptions = [
-        { value: 'Received', label: 'Received' },
-        { value: 'To Ship', label: 'To Ship' },
-        { value: 'Canceled', label: 'Canceled' },
-        { value: 'Order Placed', label: 'Order Placed' },
-        { value: 'In Cart', label: 'In Cart' },
-
-
-    ];
+    const [statusOptions, setStatusOptions] = useState('');
+    const [statusCanceled, setStatusCanceled] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState('change_status'); // Trạng thái được chọn
 
     const handleStatusChange = (event) => {
@@ -183,47 +178,51 @@ export default function PurchaseOderPage() {
     };
 
 
-    const handleDelete = async (idSelected) => {
-        console.log(selectedStatus)
-        const confirmCancel = window.confirm('Are you sure you want to perform this operation?');
-        if (!confirmCancel) return;
-        // const data = await getPurchaseById(idSelected);
-
+    const handleUpdateSt = async () => {
+        setOpenDialogConfirm(false);
+        setOpen(null);
         const purDTO = {
             id: idSelected,
-            status: selectedStatus
+            status: statusOptions
         }
         console.log(purDTO)
         const response = await updatePurchaseStatus(purDTO);
+        if (statusOptions === "ToShip") {
+            const deletef = await deleteFolder(idSelected);
+        }
         setCheckUpdate(checkUpdate + 1);
     };
 
 
 
-    const handleRowClick = (id, delid) => {
+    const handleRowClick = async (id, delid) => {
         setIdSelected(id);
         setDelidSelected(delid);
 
+        const data = await getPurchaseById(id);
+        if (data.status === "Order Placed") {
+            setStatusOptions("Order Paid");
+            setStatusCanceled(true);
+        }
+        if (data.status === "Order Paid") {
+            setStatusOptions("ToShip");
+            setStatusCanceled(false);
+        }
+        if (data.status === "ToShip") {
+            setStatusOptions("Received");
+            setStatusCanceled(false);
+        }
+        if (data.status === "Received") {
+            setStatusOptions('');
+            setStatusCanceled(false);
+        }
+        if (data.status === "Caceled") {
+            setStatusOptions('');
+            setStatusCanceled(false);
+        }
+
     }
 
-    const handleClickReviewDialog = async (id) => {
-        // const data = await getUserById(id);
-        // setUser(data.result);
-        // setOpenDialogReview(true);
-    }
-
-    const handleCloseDialogReview = () => {
-        setOpenDialogReview(false);
-    }
-
-    const handleClickFeedBackDialog = async (id) => {
-        // const data = await getUserById(id);
-        // setUser(data.result);
-        // setOpenDialogFeedBack(true);
-    }
-    const handleCloseDialogFeedBack = () => {
-        setOpenDialogFeedBack(false);
-    }
 
     const handleDetails = async (id) => {
         const data = await getDeliveryById(id);
@@ -233,6 +232,13 @@ export default function PurchaseOderPage() {
 
     const handleCloseDialogDetails = () => {
         setOpenDialogDetails(false);
+    }
+    const handleCloseDialogConfirm = () => {
+        setOpenDialogConfirm(false);
+    }
+
+    const handleOpenDialogConfirm = () => {
+        setOpenDialogConfirm(true);
     }
 
 
@@ -264,7 +270,7 @@ export default function PurchaseOderPage() {
                     <Scrollbar>
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table>
-                                <UserListHead
+                                <PurchaseListHead
                                     order={order}
                                     orderBy={orderBy}
                                     headLabel={TABLE_HEAD}
@@ -278,10 +284,10 @@ export default function PurchaseOderPage() {
                                         const selectedUser = selected.indexOf(row.id) !== -1;
 
                                         return (
-                                            <TableRow hover key={row.id} tabIndex={-1} role="checkbox" onClick={() => handleRowClick(row.id, row.deliveryInfoId)}>
-                                                <TableCell padding="checkbox">
+                                            <TableRow hover key={row.id} tabIndex={-1} onClick={() => handleRowClick(row.id, row.deliveryInfoId)}>
+                                                {/* <TableCell padding="checkbox">
                                                     <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
-                                                </TableCell>
+                                                </TableCell> */}
 
 
                                                 <TableCell align="left">{row.user.fullName}</TableCell>
@@ -289,7 +295,7 @@ export default function PurchaseOderPage() {
                                                 <TableCell align="left">{fDate(row.createDate)}</TableCell>
                                                 <TableCell align="left">{row.priceTotal}</TableCell>
                                                 <TableCell align="left">
-                                                    <Label color={(row.status === 'Disabled' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
+                                                    <Label color={(row.status === 'Canceled' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
                                                 </TableCell>
 
                                                 <TableCell align="right">
@@ -328,38 +334,42 @@ export default function PurchaseOderPage() {
                                         }}
                                     >
                                         <MenuItem>
-                                            <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-                                            <Button variant="outlined" onClick={() => handleDetails(delidSelected)}>
-                                                Details
+                                            <Iconify icon={'eva:info-outline'} sx={{ mr: 1 }} />
+                                            <Button variant="outlined" onClick={() => handleDetails(delidSelected)} >
+                                                Delivery Infomation
                                             </Button>
                                         </MenuItem>
 
-                                        <MenuItem>
-                                            <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-                                            <Select
-                                                value={selectedStatus}
-                                                onChange={handleStatusChange}
-                                                onClick={() => handleDelete(idSelected)}
-                                            >
-                                                <MenuItem value="change_status">Change Status</MenuItem>
-                                                {statusOptions.map((option) => (
-                                                    <MenuItem key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </MenuItem>
+                                        {statusOptions !== '' && (
+                                            <MenuItem>
+                                                <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    onClick={() => handleOpenDialogConfirm()}
+                                                >
+                                                    {statusOptions}
+                                                </Button>
+                                            </MenuItem>
+                                        )}
 
+                                        {statusCanceled && (
+                                            <MenuItem>
+                                                <Iconify icon={'eva:close-square-fill'} sx={{ mr: 1 }} />
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    sx={{ color: 'red' }}
+                                                    onClick={() => {
+                                                        handleOpenDialogConfirm();
+                                                        setStatusOptions("Canceled");
+                                                    }}
+                                                >
+                                                    Canceled
+                                                </Button>
+                                            </MenuItem>
+                                        )}
 
-
-
-
-                                        {/* <MenuItem sx={{ color: 'error.main' }}>
-                                            <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
-                                            <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
-                                                Delete
-                                            </Button>
-                                        </MenuItem> */}
 
                                     </Popover>
 
@@ -408,7 +418,8 @@ export default function PurchaseOderPage() {
 
             </Container>
 
-
+            <DialogConfirm openDialog={openDialogConfirm} contentConfirm="Are you sure you want to perform this operation?"
+                handleCloseDialog={handleCloseDialogConfirm} handleAccept={handleUpdateSt} />
         </>
     );
 }

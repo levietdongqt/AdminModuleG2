@@ -4,3 +4,6 @@ export { default as ShowReviews } from './ShowReviews'
 export { default as ShowFeedBack } from './ShowFeedBack'
 export { default as UserDetails } from './UserDetails'
 export { default as PurchaseDeliveryInfo } from './PurchaseDeliveryInfo'
+export { default as PurchaseListHead } from './PurchaseListHead';
+
+
