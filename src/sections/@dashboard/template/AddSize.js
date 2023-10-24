@@ -96,10 +96,11 @@ export default function AddSize({ openDialog, handleCloseDialog, template }) {
             width: 500, // thay đổi độ rộng cố định theo ý muốn của bạn
             height: "auto", // thay đổi chiều dài cố định theo ý muốn của bạn
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+            letterSpacing:"0.05em"
           },
         }}
       >
-        <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
+        <DialogTitle color={'GrayText'} align={'center'} style={{ fontSize: 30,letterSpacing:"0.05em" }}>
           {template.name}
         </DialogTitle>
         <CustomDialogContent>

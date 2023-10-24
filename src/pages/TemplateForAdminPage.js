@@ -294,10 +294,10 @@ export default function TemplateForAdminPage() {
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom color={'Highlight'}>
-            TEMPLATE
+          <Typography variant="h4" gutterBottom color={'Highlight'} sx={{letterSpacing:"0.05em"}}>
+          Template Management
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} href="template/create" color="info">
+          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} href="/template/create" color="secondary" sx={{letterSpacing:"0.05em"}}>
             NEW TEMPLATE
           </Button>
         </Stack>
@@ -313,7 +313,7 @@ export default function TemplateForAdminPage() {
           />
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
+            <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
               <Table>
                 <TemplateListHead
                   order={order}
@@ -470,6 +470,7 @@ export default function TemplateForAdminPage() {
               borderRadius: 0.75,
             },
             backgroundColor: 'whitesmoke',
+            letterSpacing:"0.05em"
           },
         }}
       >

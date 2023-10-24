@@ -5,8 +5,9 @@ import { styled } from '@mui/material/styles';
 import { Box, FormControl, FormLabel, InputGroup, Input, Text, InputRightElement, Button, Checkbox, useToast } from '@chakra-ui/react';
 import { Stack, TextField, InputLabel } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useFormik } from 'formik';
 
+import { useFormik } from 'formik';
+import bcrypt  from 'bcryptjs/dist/bcrypt';
 import { useUserContext } from '../contexts/UserContext';
 import LoginValidations from '../validations/LoginValidations';
 import { Login as LogIn } from '../api/AuthServices';
@@ -35,8 +36,8 @@ const Login = () => {
         setCookie('currentUser', result.data.result, { path: '/app' });
         setTokenCookie('accessToken', result.data.token, { path: '/app' })
       } else {
-        setCookie('currentUser', result.data.result, { path: '/app', expires: 0 });
-        setTokenCookie('accessToken', result.data.token, { path: '/app', expires: 0 })
+        setCookie('currentUser', result.data.result, { path: '/app',expires:0 });
+        setTokenCookie('accessToken',result.data.token,{ path: '/app',expires:0 })
       };
     } else {
       resetForm();
@@ -57,7 +58,6 @@ const Login = () => {
       password: ''
     },
     onSubmit: values => {
-      console.log('sadasd')
       LogIn(values.email, values.password)
         .then((result) => {
           handldeResponse(result, remember);
@@ -104,7 +104,7 @@ const Login = () => {
           </InputGroup>
         </FormControl>
         <Checkbox value={remember} onChange={() => setRemember(!remember)} mt={5} >Remember me</Checkbox>
-        <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} onClick={handleSubmit} >Login</Button>
+        <Button mt={5} width='100%' variant='solid' colorScheme='facebook'  disabled={!isValid} onClick={handleSubmit} >Login</Button>
         <br />
       </Box>
     </Stack>

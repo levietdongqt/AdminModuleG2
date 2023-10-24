@@ -50,7 +50,7 @@ export default function Nav({ openNav, onCloseNav }) {
     <Scrollbar
       sx={{
         height: 1,
-        '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
+        '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column',letterSpacing:"0.05em" },
       }}
     >
       <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
@@ -70,11 +70,11 @@ export default function Nav({ openNav, onCloseNav }) {
             <Avatar src={`${process.env.REACT_APP_API_BASE_IMAGE}${currentUser.avatar}`} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
+              <Typography variant="subtitle2" sx={{ color: 'text.primary',letterSpacing:"0.05em" }}>
                 {currentUser.fullName}
               </Typography>
 
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary',letterSpacing:"0.05em" }}>
                 {currentUser.role}
               </Typography>
             </Box>

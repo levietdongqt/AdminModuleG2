@@ -21,11 +21,13 @@ import {
   Typography,
   TextField,
   InputLabel,
+  Tooltip,
 } from '@mui/material';
 import { useToast } from '@chakra-ui/react';
 import JoditEditor from 'jodit-react';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -33,7 +35,7 @@ import Scrollbar from '../../../components/scrollbar';
 import { fDateTime } from '../../../utils/formatTime';
 
 import { TemplateListHead } from '../template';
-import { UpdateAllFeedBack, GetFeedBacksByStatus,SendMail } from '../../../api/FeedBackServices';
+import { UpdateAllFeedBack, GetFeedBacksByStatus, SendMail } from '../../../api/FeedBackServices';
 
 const CustomDialogContent = styled(DialogContent)({
   display: 'flex',
@@ -78,9 +80,9 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
   const [popoverContent, setPopoverContent] = useState('');
   const [feedBacks, setFeedBacks] = useState(user.feedBacks);
 
-  const [subject,setSubject] = useState('');
-  const [message,setMessage] = useState('');
-  const [email,setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleOpenMenu = (event, content) => {
     setOpen(event.currentTarget);
@@ -142,18 +144,15 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
     setFeedBacks(user.feedBacks);
   };
 
-  const handleSubmit = async ()=>{
-    const response = await SendMail(email,subject,message,"Feedback");
+  const handleSubmit = async () => {
+    const response = await SendMail(email, subject, message, 'Feedback');
     console.log(response);
-  }
+  };
 
-  const handleClickSubject = (event,email) =>{
+  const handleClickSubject = (event, email) => {
     setSubject(event.target.value);
     setEmail(email);
-    
-  }
-
-  
+  };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - user.reviews.length) : 0;
 
@@ -168,6 +167,7 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
           width: 1200, // thay đổi độ rộng cố định theo ý muốn của bạn
           height: 600, // thay đổi chiều dài cố định theo ý muốn của bạn
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+          letterSpacing: '0.05em',
         },
       }}
     >
@@ -179,8 +179,19 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
           <Card>
             <Scrollbar>
               <CustomTableContainer>
-                <Button variant="outlined" onClick={handleShowAll}>
-                  Show All
+                <Button
+                  component="label"
+                  variant="outlined"
+                  startIcon={<CloudUploadIcon />}
+                  color="inherit"
+                  sx={
+                    {
+                      // ... các style khác
+                    }
+                  }
+                  onClick={handleShowAll}
+                >
+                  All Feedback
                 </Button>
                 <Button variant="outlined" onClick={handleShowImportant}>
                   Show Important
@@ -202,13 +213,15 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                         return (
                           <TableRow hover key={row.id} tabIndex={-1}>
                             <TableCell align="left">
-                              <IconButton onClick={() => handleIsImportant(row.id)}>
-                                {row.isImportant ? (
-                                  <Iconify icon={'ion:star'} color={'orange'} />
-                                ) : (
-                                  <Iconify icon={'ion:star-outline'} />
-                                )}
-                              </IconButton>
+                              <Tooltip title="Check Important">
+                                <IconButton onClick={() => handleIsImportant(row.id)}>
+                                  {row.isImportant ? (
+                                    <Iconify icon={'ion:star'} color={'orange'} />
+                                  ) : (
+                                    <Iconify icon={'ion:star-outline'} />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
                             </TableCell>
                             <TableCell align="left">{fDateTime(row.feedBackDate)}</TableCell>
 
@@ -219,16 +232,20 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                                 ? `${row.content.substring(0, maxLength)}...`
                                 : row.content}
                               {row.content.length > maxLength && (
-                                <IconButton onClick={(event) => handleOpenMenu(event, row.content)}>
-                                  <ExpandMoreIcon />
-                                </IconButton>
+                                <Tooltip title="Show All">
+                                  <IconButton onClick={(event) => handleOpenMenu(event, row.content)}>
+                                    <ExpandMoreIcon />
+                                  </IconButton>
+                                </Tooltip>
                               )}
                             </TableCell>
 
                             <TableCell align="right" sx={{ alignItems: 'center' }}>
-                              <IconButton onClick={(event) => handleOpenMail(event)}>
-                                <Iconify icon={'material-symbols:mail-outline'} />
-                              </IconButton>
+                              <Tooltip title="Send Mail">
+                                <IconButton onClick={(event) => handleOpenMail(event)}>
+                                  <Iconify icon={'material-symbols:mail-outline'} />
+                                </IconButton>
+                              </Tooltip>
                             </TableCell>
                             <Popover
                               open={Boolean(open)}
@@ -280,8 +297,15 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                                 <Typography variant="h4" gutterBottom color="secondary">
                                   Send Mail
                                 </Typography>
-                                <InputLabel id="demo-simple-select-label" value>Message:</InputLabel>                               
-                                <TextField label="Subject" fullWidth type="text" onChange={(event) => handleClickSubject(event,row.email)}/>
+                                <InputLabel id="demo-simple-select-label" value>
+                                  Message:
+                                </InputLabel>
+                                <TextField
+                                  label="Subject"
+                                  fullWidth
+                                  type="text"
+                                  onChange={(event) => handleClickSubject(event, row.email)}
+                                />
                                 <InputLabel id="demo-simple-select-label">Message:</InputLabel>
                                 <JoditEditor
                                   id="description"
@@ -289,13 +313,7 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                                   ref={editor}
                                   onChange={(newContent) => setMessage(newContent)}
                                 />
-                                <Button
-                                  fullWidth
-                                  size="large"
-                                  type="submit"
-                                  variant="contained"
-                                  onClick={handleSubmit}
-                                >
+                                <Button fullWidth size="large" type="submit" variant="contained" onClick={handleSubmit}>
                                   Send
                                 </Button>
                               </Typography>

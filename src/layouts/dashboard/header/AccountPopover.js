@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 // @mui
 import { alpha } from '@mui/material/styles';
-import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover, Button } from '@mui/material';
+import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover, Button,Tooltip } from '@mui/material';
 
 import { useToast } from '@chakra-ui/react';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -106,7 +106,8 @@ export default function AccountPopover() {
               typography: 'body2',
               borderRadius: 0.75,
             },
-            backgroundColor:'whitesmoke'
+            backgroundColor:'whitesmoke',
+            letterSpacing: "0.05em"
           },
         }}
       >
@@ -124,19 +125,20 @@ export default function AccountPopover() {
           <MenuItem onClick={handleHome} sx={{ m: 1, color: 'success.main' }}>
             <Iconify icon={'solar:home-bold-duotone'} sx={{ mr: 1 }} />
 
-            <Button variant="text" fullWidth>Home</Button>
+            <Button variant="text" fullWidth sx={{letterSpacing:"0.05em"}} >Home</Button>
           </MenuItem>
           <MenuItem onClick={handleProfile} sx={{ m: 1,color: 'info.main' }}>
             <Iconify icon={'carbon:user-profile'} sx={{ mr: 1 }} />
 
-            <Button variant="text" fullWidth>Profile</Button>
+            <Button variant="text" fullWidth sx={{letterSpacing:"0.05em"}}>Profile</Button>
           </MenuItem>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
+        <Tooltip title="Logout">
         <MenuItem onClick={handleLogout} sx={{ m: 1,display: 'flex', justifyContent: 'center',color:'white',backgroundColor:'#AEDEFC' }}>
           <LogoutIcon/>
         </MenuItem>
+        </Tooltip>
       </Popover>
       <UserDetails openDialog={openDialog} handleCloseDialog={handleCloseDialog} user={currentUser}/>
     </>
