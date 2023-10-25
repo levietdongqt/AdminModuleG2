@@ -109,12 +109,7 @@ export default function UserPage() {
   const [statusOptions, setStatusOptions] = useState('');
 
   useEffect(() => {
-<<<<<<< HEAD
-    GetAllUserAsync(search, true, 1, 1000);
-=======
-    GetAllUserAsync(search,st, 1, 1000);
-
->>>>>>> main
+    GetAllUserAsync(search, st, 1, 1000);
   }, [search, st, checkUpdate]);
 
   const GetAllUserAsync = async (search, st, page, pageSize) => {
@@ -246,21 +241,18 @@ export default function UserPage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
-<<<<<<< HEAD
-=======
-  const handleAcceptClick = (value) =>{
+  const handleAcceptClick = (value) => {
     setSt(value);
-  }
+  };
 
-  const handleDisableClick = (value) =>{
+  const handleDisableClick = (value) => {
     setSt(value);
-  }
+  };
 
-  const handleSpendingClick = (value) =>{
+  const handleSpendingClick = (value) => {
     setSt(value);
-  }
+  };
 
->>>>>>> main
   return (
     <>
       <Helmet>
@@ -270,23 +262,22 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom color={'Highlight'}>
-          User Management
+            User Management
           </Typography>
         </Stack>
 
         <Card>
-<<<<<<< HEAD
           <UserListToolbar
             numSelected={selected.length}
             filterName={search}
             onFilterName={handleFilterByEmailOrPhone}
+            onActiveClick={handleAcceptClick}
+            onDisableClick={handleDisableClick}
+            onSpendingClick={handleSpendingClick}
           />
-=======
-          <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} onActiveClick={handleAcceptClick} onDisableClick={handleDisableClick} onSpendingClick={handleSpendingClick} />
->>>>>>> main
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
+            <TableContainer sx={{ minWidth: 800, letterSpacing: '0.05em' }}>
               <Table>
                 <UserListHead
                   order={order}
