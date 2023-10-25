@@ -22,10 +22,14 @@ import {
   Box,
   Popover,
   MenuItem,
+  Tooltip
 } from '@mui/material';
 import { useToast } from '@chakra-ui/react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import StarRateIcon from '@mui/icons-material/StarRate';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -169,7 +173,7 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
         style: {
           backgroundColor: 'whitesmoke', // thay đổi màu nền theo ý muốn của bạn
           width: 1200, // thay đổi độ rộng cố định theo ý muốn của bạn
-          height: 600, // thay đổi chiều dài cố định theo ý muốn của bạn
+          height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
           borderRadius: 10,
         },
@@ -183,8 +187,10 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
           <Card>
             <Scrollbar>
               <CustomTableContainer>
-                <Button variant="outlined" onClick={handleShowAll}>Show All</Button>
-                <Button variant="outlined" onClick={handleShowImportant}>Show Important</Button>
+                <Button variant="outlined"
+                  startIcon={<SelectAllIcon />}
+                  color="inherit" onClick={handleShowAll}>Show All</Button>
+                <Button variant="outlined" startIcon={<StarRateIcon/>} color="inherit" onClick={handleShowImportant}>Show Important</Button>
                 <Table>
                   <CustomTableHead>
                     <TableRow>
@@ -217,19 +223,24 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
                                 ? `${row.content.substring(0, maxLength)}...`
                                 : row.content}
                               {row.content.length > maxLength && (
+                                <Tooltip title="Expand">
                                 <IconButton onClick={(event) => handleOpenMenu(event, row.content)}>
                                   <ExpandMoreIcon />
                                 </IconButton>
+                                </Tooltip>
                               )}
                             </TableCell>
 
                             <TableCell align="left">{row.rating}</TableCell>
-
+                            
                             <TableCell align="right" sx={{ alignItems: 'center' }}>
+                            <Tooltip title="Remove">
                               <IconButton onClick={() => handleDelete(row.id)}>
                                 <Iconify icon={'eva:trash-2-outline'} />
                               </IconButton>
+                              </Tooltip>
                             </TableCell>
+                            
                             <Popover
                               open={Boolean(open)}
                               anchorEl={open}
@@ -283,7 +294,20 @@ export default function ShowReviews({ openDialog, handleCloseDialog, user }) {
         </Container>
       </CustomDialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Close</Button>
+      <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="inherit"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
       </DialogActions>
     </Dialog>
   );

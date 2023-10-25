@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
-
+import { CookiesProvider } from 'react-cookie';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 //
 import App from './App';
 
@@ -17,7 +18,7 @@ import { UserProvider } from './contexts/UserContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-<UserProvider><App /></UserProvider>);
+<GoogleOAuthProvider clientId="349595782448-43gvctriiege3k72basdtv2qhu3f1nbq.apps.googleusercontent.com"><UserProvider><CookiesProvider><App /></CookiesProvider></UserProvider></GoogleOAuthProvider>);
 
 // If you want to enable client cache, register instead.
 serviceWorker.unregister();

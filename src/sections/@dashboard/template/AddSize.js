@@ -23,7 +23,11 @@ import {
   Alert,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useToast } from '@chakra-ui/react';
 import Scrollbar from '../../../components/scrollbar';
+
 
 import { fDateTime } from '../../../utils/formatTime';
 import { GetAllSizes,AddSizeAsync } from '../../../api/TemplateService';
@@ -36,20 +40,12 @@ const CustomDialogContent = styled(DialogContent)({
 });
 
 export default function AddSize({ openDialog, handleCloseDialog, template }) {
+  const toast = useToast();
   const [editMode, setEditMode] = useState(false);
   const [sizes,setSizes] = useState([]);
   const [sizesSeleted,setSizesSeleted] = useState([]);
 
   const [sizeTemplate,setSizeTemplate] = useState([])
-  const [error,setError] = useState(false);
-
-  const errorPopup = (mess ) => {
-    swal({
-      title: "Warning",
-      text: mess,
-      icon: "warning",
-    })
-  }
 
 
   useEffect(()=>{
@@ -80,10 +76,7 @@ export default function AddSize({ openDialog, handleCloseDialog, template }) {
 
   if (!idsExist) {
     setSizeTemplate([...updatedTemplate, ...size]);
-    setError(false);
-  } else {
-     setError(true);
-  }
+  } 
   };
 
   const handleDeleteSize = (selectedItem) => {
@@ -92,6 +85,23 @@ export default function AddSize({ openDialog, handleCloseDialog, template }) {
   };
   const handleAddSize = async () => {
     const response = await AddSizeAsync(template.id,sizeTemplate);
+    if (response.data.status === 201) {
+      toast({
+        title: 'Update',
+        description: 'You have All Size successfully.',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Error!',
+        description: 'Add Size Fail.',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+    }
     console.log(response);
   }
   return (
@@ -151,14 +161,37 @@ export default function AddSize({ openDialog, handleCloseDialog, template }) {
             <MenuItem key={size.id} value={size}>{`${size.width}x${size.length}`}</MenuItem>
           ))}
         </Select>
-        {error? (
-          <Alert severity="error">Size is existed</Alert>
-        ) : null}
         </Box>
         </CustomDialogContent>
         <DialogActions>
-           <Button onClick={handleAddSize}>Add</Button>
-          <Button onClick={handleCloseDialog}>Close</Button>
+        <Button
+                component="label"
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                color="info"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleAddSize}
+              >
+                Add
+              </Button>
+           <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="success"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
         </DialogActions>
       </Dialog>
   );

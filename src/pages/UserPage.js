@@ -21,6 +21,7 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
+  Tooltip,
 } from '@mui/material';
 // components
 import Label from '../components/label';
@@ -322,11 +323,13 @@ export default function UserPage() {
                           </Label>
                         </TableCell>
 
+                        <Tooltip title="Function">
                         <TableCell align="right">
                           <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
+                        </Tooltip>
                       </TableRow>
                     );
                   })}

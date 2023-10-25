@@ -12,9 +12,11 @@ import {
   styled,
   Avatar,
   IconButton,
+  Tooltip
 } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import { fDate } from '../../../utils/formatTime';
 
 const CustomDialogContent = styled(DialogContent)({
@@ -96,9 +98,11 @@ export default function UserDetails({ openDialog, handleCloseDialog, user }) {
 
           <Typography variant="body1" color="textSecondary" style={{ margin: 5 }}>
             <strong>Delivery Information:</strong>
+            <Tooltip title={expanded ? "Expand Less" : "Expand More"}>
             <IconButton aria-label="expand" onClick={handleExpandClick}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
+            </Tooltip>
             <Box sx={{ backgroundColor: '#EAD7BB',border:1,marginBottom: 2 }}>
               <Typography variant="body1" color="textSecondary" style={{ margin: 5 }}>
                 <strong>_Address:</strong>{' '}
@@ -136,7 +140,20 @@ export default function UserDetails({ openDialog, handleCloseDialog, user }) {
         </div>
       </CustomDialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Close</Button>
+      <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="inherit"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
       </DialogActions>
     </Dialog>
   );

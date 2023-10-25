@@ -6,9 +6,9 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
 
     const [cookies] = useCookies(['currentUser']);
-    const [tokenCookie] = useCookies(['accessToken']);
+    const [tokenCookie] = useCookies(['access_token']);
     const [currentUser, setCurrentUser] = useState(cookies.currentUser || '');
-    const [accessToken,setToken]  = useState(tokenCookie.accessToken || '');
+    const [accessToken,setToken]  = useState(tokenCookie.access_token || '');
     const values = {
         currentUser,
         setCurrentUser,

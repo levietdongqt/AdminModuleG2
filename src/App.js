@@ -3,6 +3,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // routes
 import Router from './routes';
@@ -26,7 +27,6 @@ import Router2 from './routes2';
 export default function App() {
   return (
     <HelmetProvider>
-      <CookiesProvider>
       <BrowserRouter>
       <ChakraProvider>
         <ThemeProvider>
@@ -36,7 +36,6 @@ export default function App() {
         </ThemeProvider>
         </ChakraProvider>
       </BrowserRouter>
-      </CookiesProvider>
     </HelmetProvider>
   );
 }
