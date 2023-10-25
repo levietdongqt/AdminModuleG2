@@ -22,8 +22,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const logo = (
     <Box
       component="img"
-      src={`${process.env.REACT_APP_API_BASE_IMAGE}/Avatar/LOGOIMAGE.png`}
-      sx={{ width: 200, height: 200, cursor: 'pointer', ...sx }}
+      src={`${process.env.REACT_APP_API_BASE_IMAGE}/Avatar/logomoi.png`}
+      sx={{ width: 200, height: 100, cursor: 'pointer', ...sx }}
     />
   );
 
