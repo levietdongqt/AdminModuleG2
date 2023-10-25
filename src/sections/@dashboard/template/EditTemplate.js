@@ -190,7 +190,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
           width: 1000, // thay đổi độ rộng cố định theo ý muốn của bạn
           height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-          letterSpacing:"0.05em"
+          letterSpacing: "0.05em"
         },
       }}
     >
