@@ -38,7 +38,7 @@ import {
   ShowReviews,
   ShowFeedBack,
   PurchaseListHead,
-  UserListToolbar,
+  PurchaseListToolbar,
   PurchaseDeliveryInfo,
 } from '../sections/@dashboard/user';
 
@@ -264,7 +264,7 @@ export default function PurchaseOderPage() {
           </Typography>
         </Stack>
         <Card>
-          <UserListToolbar
+          <PurchaseListToolbar
             numSelected={selected.length}
             filterName={search}
             onFilterName={handleFilterByEmailOrPhone}
