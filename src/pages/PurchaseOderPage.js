@@ -251,16 +251,16 @@ export default function PurchaseOderPage() {
 
   const isNotFound = !filteredPurs.length && !!filterName;
 
-  return (
-    <>
-      <Helmet>
-        <title> PurchaseOder </title>
-      </Helmet>
+    return (
+        <>
+            <Helmet>
+                <title> Purchase Oder </title>
+            </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom color={'Highlight'}>
-            PurchaseOder
+            Purchase Oder Management
           </Typography>
         </Stack>
         <Card>
@@ -270,30 +270,25 @@ export default function PurchaseOderPage() {
             onFilterName={handleFilterByEmailOrPhone}
           />
 
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <PurchaseListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={purs.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                <TableBody>
-                  {filteredPurs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const selectedUser = selected.indexOf(row.id) !== -1;
+                    <Scrollbar>
+                        <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
+                            <Table>
+                                <PurchaseListHead
+                                    order={order}
+                                    orderBy={orderBy}
+                                    headLabel={TABLE_HEAD}
+                                    rowCount={purs.length}
+                                    numSelected={selected.length}
+                                    onRequestSort={handleRequestSort}
+                                    onSelectAllClick={handleSelectAllClick}
+                                />
+                                <TableBody>
+                                    {filteredPurs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                        const selectedUser = selected.indexOf(row.id) !== -1;
 
-                    return (
-                      <TableRow
-                        hover
-                        key={row.id}
-                        tabIndex={-1}
-                        onClick={() => handleRowClick(row.id, row.deliveryInfoId)}
-                      >
-                        {/* <TableCell padding="checkbox">
+                                        return (
+                                            <TableRow hover key={row.id} tabIndex={-1} onClick={() => handleRowClick(row.id, row.deliveryInfoId)}>
+                                                {/* <TableCell padding="checkbox">
                                                     <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
                                                 </TableCell> */}
 

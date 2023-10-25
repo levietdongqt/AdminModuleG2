@@ -36,12 +36,12 @@ import { DialogConfirm } from '../sections/@dashboard/template';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Full Name', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
-  { id: 'phone', label: 'Phone', alignRight: false },
-  { id: 'gender', label: 'Gender', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'name', label: 'FUll NAME', alignRight: false },
+  { id: 'email', label: 'EMAIL', alignRight: false },
+  { id: 'phone', label: 'PHONE NUMBER', alignRight: false },
+  { id: 'gender', label: 'GENDER', alignRight: false },
+  { id: 'isVerified', label: 'VERIFIED MAIL', alignRight: false },
+  { id: 'status', label: 'STATUS', alignRight: false },
   { id: '' },
 ];
 
@@ -95,7 +95,7 @@ export default function UserPage() {
 
   const [search, setSearch] = useState('');
 
-  const [st, setSt] = useState(true);
+  const [st, setSt] = useState(null);
 
   const [idSelected, setIdSelected] = useState(null);
 
@@ -109,7 +109,12 @@ export default function UserPage() {
   const [statusOptions, setStatusOptions] = useState('');
 
   useEffect(() => {
+<<<<<<< HEAD
     GetAllUserAsync(search, true, 1, 1000);
+=======
+    GetAllUserAsync(search,st, 1, 1000);
+
+>>>>>>> main
   }, [search, st, checkUpdate]);
 
   const GetAllUserAsync = async (search, st, page, pageSize) => {
@@ -241,6 +246,21 @@ export default function UserPage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
+<<<<<<< HEAD
+=======
+  const handleAcceptClick = (value) =>{
+    setSt(value);
+  }
+
+  const handleDisableClick = (value) =>{
+    setSt(value);
+  }
+
+  const handleSpendingClick = (value) =>{
+    setSt(value);
+  }
+
+>>>>>>> main
   return (
     <>
       <Helmet>
@@ -250,19 +270,23 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom color={'Highlight'}>
-            User
+          User Management
           </Typography>
         </Stack>
 
         <Card>
+<<<<<<< HEAD
           <UserListToolbar
             numSelected={selected.length}
             filterName={search}
             onFilterName={handleFilterByEmailOrPhone}
           />
+=======
+          <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} onActiveClick={handleAcceptClick} onDisableClick={handleDisableClick} onSpendingClick={handleSpendingClick} />
+>>>>>>> main
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
+            <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
               <Table>
                 <UserListHead
                   order={order}
@@ -279,15 +303,16 @@ export default function UserPage() {
 
                     return (
                       <TableRow hover key={row.id} tabIndex={-1} role="checkbox" onClick={() => handleRowClick(row.id)}>
-                        <TableCell padding="checkbox">
+                        {/* <TableCell padding="checkbox">
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, row.id)} />
-                        </TableCell>
+                        </TableCell> */}
+                        <TableCell> </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
                             <Avatar alt={row.email} src={`${process.env.REACT_APP_API_BASE_IMAGE}${row.avatar}`} />
                             <Typography variant="subtitle2" noWrap>
-                              {row.FullName}
+                              {row.fullName}
                             </Typography>
                           </Stack>
                         </TableCell>

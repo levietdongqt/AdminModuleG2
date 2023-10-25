@@ -14,7 +14,7 @@ AppTrafficBySite.propTypes = {
 
 export default function AppTrafficBySite({ title, subheader, list, ...other }) {
   return (
-    <Card {...other}>
+    <Card {...other} >
       <CardHeader title={title} subheader={subheader} />
 
       <CardContent>
@@ -26,8 +26,8 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
           }}
         >
           {list.map((site) => (
-            <Paper key={site.name} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
-              <Box sx={{ mb: 0.5 }}>{site.icon}</Box>
+            <Paper key={site.name} variant="outlined" sx={{ py: 2.5, textAlign: 'center',backgroundColor:'whitesmoke' }}>
+              <Box sx={{ mb: 0.5,pl: 0.2 }}>{site.icon}</Box>
 
               <Typography variant="h6">{fShortenNumber(site.value)}</Typography>
 

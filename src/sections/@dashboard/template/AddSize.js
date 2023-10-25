@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import swal from 'sweetalert';
 import {
   Paper,
   Button,
@@ -41,6 +42,14 @@ export default function AddSize({ openDialog, handleCloseDialog, template }) {
 
   const [sizeTemplate,setSizeTemplate] = useState([])
   const [error,setError] = useState(false);
+
+  const errorPopup = (mess ) => {
+    swal({
+      title: "Warning",
+      text: mess,
+      icon: "warning",
+    })
+  }
 
 
   useEffect(()=>{

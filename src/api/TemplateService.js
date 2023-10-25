@@ -103,4 +103,20 @@ export async function AddSizeAsync(id,data){
     }
 }
 
+export async function DeleteImageById(id){
+    try{
+        const response = await baseRequest.delete(`${process.env.REACT_APP_API_BASE_URL}/Template/Image/${id}`);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}
+export async function DeleteImageAllById(arrayId){
+    try{
+        const response = await baseRequest.put(`${process.env.REACT_APP_API_BASE_URL}/Template/DeleteAllImages`,arrayId);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}
 

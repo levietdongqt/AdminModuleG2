@@ -4,7 +4,7 @@ import baseRequest from '../contexts/AxiosContext';
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
     let response;
-    if (search !== null) {
+    if (search !== null && st === null) {
       response = await baseRequest.get(
         `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?search=${search}&&page=${page}&&pageSize=${pageSize}`
       );
@@ -12,6 +12,13 @@ export const getAllUsers = async (search, st, page, pageSize) => {
       response = await baseRequest.get(
         `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?page=${page}&&pageSize=${pageSize}`
       );
+    }
+    if(search !== null && st !== null){
+      response = await baseRequest.get(
+        `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?search=${search}&&st=${st}&&page=${page}&&pageSize=${pageSize}`)
+    }else if(search === null && st === null){
+      response = await baseRequest.get(
+        `${process.env.REACT_APP_API_BASE_URL}/User/GetAll?st=${st}&&page=${page}&&pageSize=${pageSize}`)
     }
 
     return response;
