@@ -109,6 +109,7 @@ export default function TemplateForAdminPage() {
   const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
   const [openDialogConfirmAll, setOpenDialogConfirmAll] = useState(false);
   const [openDialogSize, setOpenDialogSize] = useState(false);
+  const [option,setOption]=useState("Banned");
 
   const [page, setPage] = useState(0);
 
@@ -266,9 +267,11 @@ export default function TemplateForAdminPage() {
     if (status) {
       setStatus(false);
       setCheckStatus(false);
+      setOption("Active");
     } else {
       setStatus(true);
       setCheckStatus(true);
+      setOption("Banned");
     }
   };
 
@@ -378,7 +381,7 @@ export default function TemplateForAdminPage() {
                         </TableCell>
 
                         <TableCell align="left">
-                          <Label color={(row.status === 'banned' && 'error') || 'success'}>
+                          <Label color={(row.status === false && 'error') || 'success'}>
                             {sentenceCase(row.status === true ? 'active' : 'banned')}
                           </Label>
                         </TableCell>
@@ -496,9 +499,9 @@ export default function TemplateForAdminPage() {
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
           <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
-            Delete
+            {option}
           </Button>
         </MenuItem>
       </Popover>

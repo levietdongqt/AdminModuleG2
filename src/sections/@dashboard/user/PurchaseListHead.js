@@ -54,6 +54,7 @@ export default function PurchaseListHead({
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
+              sx={{fontWeight:'bold',textAlign:'center'}}
             >
               {headCell.label}
               {orderBy === headCell.id ? (

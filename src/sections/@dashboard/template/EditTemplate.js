@@ -23,6 +23,7 @@ import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useToast } from '@chakra-ui/react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import UpdateSchemaMap from '../../../validations/UpdateValidation';
 import { UpdateTemplate,DeleteImageAllById,DeleteImageById } from '../../../api/TemplateService';
 
@@ -439,10 +440,32 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
           </div>
         </CustomDialogContent>
         <DialogActions>
-          <Button type="submit" loading={isSubmitting}>
-            Edit
-          </Button>
-          <Button onClick={handleCloseDialog}>Close</Button>
+          <Button
+              variant="outlined"
+              type="submit"
+              startIcon={<CloudUploadIcon />}
+              color="inherit"
+              loading={isSubmitting}
+              sx={{
+                letterSpacing: "0.05em"
+              }}
+            >
+              Edit
+            </Button>
+              <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="success"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
         </DialogActions>
       </form>
     </Dialog>
