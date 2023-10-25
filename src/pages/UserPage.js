@@ -31,9 +31,8 @@ import Scrollbar from '../components/scrollbar';
 import { ShowReviews, ShowFeedBack, UserListHead, UserListToolbar, UserDetails } from '../sections/@dashboard/user';
 // mock
 
-import { getAllUsers, getUserById, updateUser } from '../api/UserServices'
-import { DialogConfirm } from '../sections/@dashboard/template'
-
+import { getAllUsers, getUserById, updateUser } from '../api/UserServices';
+import { DialogConfirm } from '../sections/@dashboard/template';
 
 // ----------------------------------------------------------------------
 
@@ -101,7 +100,6 @@ export default function UserPage() {
 
   const [idSelected, setIdSelected] = useState(null);
 
-
   const [openDialogReview, setOpenDialogReview] = useState(false);
   const [openDialogFeedBack, setOpenDialogFeedBack] = useState(false);
   const [openDialogDetails, setOpenDialogDetails] = useState(false);
@@ -111,11 +109,8 @@ export default function UserPage() {
   const [checkUpdate, setCheckUpdate] = useState(0);
   const [statusOptions, setStatusOptions] = useState('');
 
-
-
   useEffect(() => {
-    GetAllUserAsync(search,st, 1, 1000);
-
+    GetAllUserAsync(search, st, 1, 1000);
   }, [search, st, checkUpdate]);
 
   const GetAllUserAsync = async (search, st, page, pageSize) => {
@@ -128,7 +123,7 @@ export default function UserPage() {
 
   const handleFilterByEmailOrPhone = (event) => {
     setSearch(event.target.value);
-  }
+  };
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -178,77 +173,68 @@ export default function UserPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-
   const handleDelete = async () => {
     setOpenDialogConfirm(false);
     setOpen(null);
-    const data = await getUserById(idSelected);
-    const formData = new FormData();
-    formData.append("status", statusOptions);
-    Object.keys(data.result).forEach((key) => {
-      formData.append(key, data.result[key]);
-    });
-
-    const response = await updateUser(formData);
-    console.log(response)
+    const addUserDTO = {
+      id: idSelected,
+      status: statusOptions,
+    };
+    const response = await updateUser(addUserDTO);
+    console.log(response);
     setCheckUpdate(checkUpdate + 1);
   };
-
-
 
   const handleRowClick = async (id) => {
     setIdSelected(id);
     const data = await getUserById(id);
-    console.log(data.FullName)
-    if (data.result.status === "Pending") {
-      setStatusOptions("Disabled")
+    console.log(data.FullName);
+    if (data.result.status === 'Pending') {
+      setStatusOptions('Disabled');
     }
-    if (data.result.status === "Disabled") {
-      setStatusOptions("Enabled")
+    if (data.result.status === 'Disabled') {
+      setStatusOptions('Enabled');
     }
-    if (data.result.status === "Enabled") {
-      setStatusOptions("Disabled")
+    if (data.result.status === 'Enabled') {
+      setStatusOptions('Disabled');
     }
-  }
+  };
 
   const handleClickReviewDialog = async (id) => {
     const data = await getUserById(id);
     setUser(data.result);
     setOpenDialogReview(true);
-  }
+  };
   const handleCloseDialogReview = () => {
     setOpenDialogReview(false);
-  }
+  };
 
   const handleClickFeedBackDialog = async (id) => {
     const data = await getUserById(id);
     setUser(data.result);
     setOpenDialogFeedBack(true);
-  }
+  };
   const handleCloseDialogFeedBack = () => {
     setOpenDialogFeedBack(false);
-  }
+  };
 
   const handleDetails = async (id) => {
     const data = await getUserById(id);
     setUser(data.result);
     setOpenDialogDetails(true);
-  }
+  };
 
   const handleCloseDialogDetails = () => {
     setOpenDialogDetails(false);
-  }
-
-
+  };
 
   const handleCloseDialogConfirm = () => {
     setOpenDialogConfirm(false);
-  }
+  };
 
   const handleOpenDialogConfirm = () => {
     setOpenDialogConfirm(true);
-  }
-
+  };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
@@ -256,17 +242,17 @@ export default function UserPage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
-  const handleAcceptClick = (value) =>{
+  const handleAcceptClick = (value) => {
     setSt(value);
-  }
+  };
 
-  const handleDisableClick = (value) =>{
+  const handleDisableClick = (value) => {
     setSt(value);
-  }
+  };
 
-  const handleSpendingClick = (value) =>{
+  const handleSpendingClick = (value) => {
     setSt(value);
-  }
+  };
 
   return (
     <>
@@ -277,15 +263,22 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom color={'Highlight'}>
-          User Management
+            User Management
           </Typography>
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} onActiveClick={handleAcceptClick} onDisableClick={handleDisableClick} onSpendingClick={handleSpendingClick} />
+          <UserListToolbar
+            numSelected={selected.length}
+            filterName={search}
+            onFilterName={handleFilterByEmailOrPhone}
+            onActiveClick={handleAcceptClick}
+            onDisableClick={handleDisableClick}
+            onSpendingClick={handleSpendingClick}
+          />
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
+            <TableContainer sx={{ minWidth: 800, letterSpacing: '0.05em' }}>
               <Table>
                 <UserListHead
                   order={order}
@@ -325,7 +318,9 @@ export default function UserPage() {
                         <TableCell align="left">{row.emailConfirmed ? 'Yes' : 'No'}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(row.status === 'Disabled' && 'error') || 'success'}>{sentenceCase(row.status)}</Label>
+                          <Label color={(row.status === 'Disabled' && 'error') || 'success'}>
+                            {sentenceCase(row.status)}
+                          </Label>
                         </TableCell>
 
                         <Tooltip title="Function">
@@ -399,7 +394,7 @@ export default function UserPage() {
               typography: 'body2',
               borderRadius: 0.75,
             },
-            backgroundColor: 'whitesmoke'
+            backgroundColor: 'whitesmoke',
           },
         }}
       >
@@ -419,15 +414,10 @@ export default function UserPage() {
 
         <MenuItem>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => handleOpenDialogConfirm()}
-          >
+          <Button variant="outlined" color="primary" onClick={() => handleOpenDialogConfirm()}>
             {statusOptions}
           </Button>
         </MenuItem>
-
 
         <MenuItem sx={{ color: 'info.main' }}>
           <Iconify icon={'octicon:code-review-24'} sx={{ mr: 1 }} />
@@ -447,8 +437,12 @@ export default function UserPage() {
       <ShowReviews openDialog={openDialogReview} handleCloseDialog={handleCloseDialogReview} user={user} />
       <ShowFeedBack openDialog={openDialogFeedBack} handleCloseDialog={handleCloseDialogFeedBack} user={user} />
       <UserDetails openDialog={openDialogDetails} handleCloseDialog={handleCloseDialogDetails} user={user} />
-      <DialogConfirm openDialog={openDialogConfirm} contentConfirm="Are you sure you want to perform this operation?"
-        handleCloseDialog={handleCloseDialogConfirm} handleAccept={handleDelete} />
+      <DialogConfirm
+        openDialog={openDialogConfirm}
+        contentConfirm="Are you sure you want to perform this operation?"
+        handleCloseDialog={handleCloseDialogConfirm}
+        handleAccept={handleDelete}
+      />
     </>
   );
 }
