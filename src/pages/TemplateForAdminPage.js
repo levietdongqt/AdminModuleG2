@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { filter, set, template } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -136,6 +136,7 @@ export default function TemplateForAdminPage() {
   const [isAscending, setIsAscending] = useState(false);
   const [idSelected, setIdSelected] = useState(null);
   const [count, setCount] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery, orderBy, isAscending, status);
@@ -297,7 +298,7 @@ export default function TemplateForAdminPage() {
           <Typography variant="h4" gutterBottom color={'Highlight'} sx={{letterSpacing:"0.05em"}}>
           Template Management
           </Typography>
-          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} href="/template/create" color="secondary" sx={{letterSpacing:"0.05em"}}>
+          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/template/create")} color="secondary" sx={{letterSpacing:"0.05em"}}>
             NEW TEMPLATE
           </Button>
         </Stack>

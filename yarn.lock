@@ -5386,6 +5386,11 @@ es-to-primitive@^1.2.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
 
+es6-object-assign@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/es6-object-assign/-/es6-object-assign-1.1.0.tgz"
+  integrity sha512-MEl9uirslVwqQU369iHNWZXsI8yaZYGg/D65aOgZkeyFJwHYSxilf7rQzXKI7DdDuBPrBXbfk3sl9hJhmd5AUw==
+
 escalade@^3.1.1:
   version "3.1.1"
   resolved "https://registry.npmjs.org/escalade/-/escalade-3.1.1.tgz"
@@ -8983,6 +8988,11 @@ process-nextick-args@~2.0.0:
   resolved "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
 
+promise-polyfill@^6.0.2:
+  version "6.1.0"
+  resolved "https://registry.npmjs.org/promise-polyfill/-/promise-polyfill-6.1.0.tgz"
+  integrity sha512-g0LWaH0gFsxovsU7R5LrrhHhWAWiHRnh1GPrhXnPgYsDkIqjRYUYSZEsej/wtleDrz5xVSIDbeKfidztp2XHFQ==
+
 promise@^8.1.0:
   version "8.2.0"
   resolved "https://registry.npmjs.org/promise/-/promise-8.2.0.tgz"
@@ -9416,6 +9426,13 @@ react-style-singleton@^2.2.1:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^2.0.0"
+
+react-sweetalert2@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.npmjs.org/react-sweetalert2/-/react-sweetalert2-0.6.0.tgz"
+  integrity sha512-4MEWGAJamSfoj56m7MUs7IfBnev9wJYs0RayvoHvxshSQeH62iK0N/EkDiHr3VuZ3vTy34kOpzL1Yg3b3VYF8w==
+  dependencies:
+    sweetalert2 "^11.7.5"
 
 react-transition-group@^4.4.5:
   version "4.4.5"
@@ -10416,6 +10433,24 @@ svgo@^2.7.0:
     csso "^4.2.0"
     picocolors "^1.0.0"
     stable "^0.1.8"
+
+sweetalert@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.npmjs.org/sweetalert/-/sweetalert-2.1.2.tgz"
+  integrity sha512-iWx7X4anRBNDa/a+AdTmvAzQtkN1+s4j/JJRWlHpYE8Qimkohs8/XnFcWeYHH2lMA8LRCa5tj2d244If3S/hzA==
+  dependencies:
+    es6-object-assign "^1.1.0"
+    promise-polyfill "^6.0.2"
+
+sweetalert2@^11.7.5:
+  version "11.7.32"
+  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.7.32.tgz"
+  integrity sha512-44tNNe2oLe7T94mT6dus4hc9G7qg6jZU/K5qZzpNS6e5HGPrSF6Kie6oZ7B5puIJydB34V2h/8f5EhIFivYo4A==
+
+sweetalert2@^6.6.1:
+  version "6.6.1"
+  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-6.6.1.tgz"
+  integrity sha512-qDKxAiQODNxSlB14wjn81u19sowJKcyZK3tAYrMBDN2Eln7WmkyhS10woMUXGSTk2xJKKVi2YWWfA+tIGZnaVw==
 
 symbol-tree@^3.2.4:
   version "3.2.4"

@@ -12,6 +12,7 @@ import {
   Popover,
   Grid,
   Tooltip,
+  Avatar,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // utils
@@ -31,7 +32,7 @@ AppNewsUpdate.propTypes = {
 
 export default function AppNewsUpdate({ title, subheader, list, ...other }) {
   return (
-    <Card {...other}>
+    <Card {...other} sx={{backgroundColor:'whitesmoke'}}>
       <CardHeader title={title} subheader={subheader} />
 
       <Scrollbar>
@@ -73,12 +74,8 @@ function NewsItem({ news }) {
   };
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
-      <Box
-        component="img"
-        alt={name}
-        src={`${process.env.REACT_APP_API_BASE_IMAGE}${image}`}
-        sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }}
-      />
+      
+      <Avatar alt={name} src={`${process.env.REACT_APP_API_BASE_IMAGE}${image}`}  />
 
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
         <Link color="inherit" variant="subtitle2" underline="hover" noWrap>

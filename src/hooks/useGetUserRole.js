@@ -6,7 +6,8 @@ const useGetUserRole = (userId) => {
     const [admin,setAdmin]=useState(false);
 
     useEffect(()=>{
-        getUserById(userId.id)
+        if(userId.id !== undefined){
+            getUserById(userId.id)
         .then((result)=>{
             console.log(result.result.role);
             if(result.result.role === 'admin'){               
@@ -16,6 +17,7 @@ const useGetUserRole = (userId) => {
             }
             
         });
+        }       
     },[userId]);
   return [admin];
 }

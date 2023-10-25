@@ -255,20 +255,20 @@ export default function PurchaseOderPage() {
     return (
         <>
             <Helmet>
-                <title> PurchaseOder </title>
+                <title> Purchase Oder </title>
             </Helmet>
 
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom color={'Highlight'}>
-                        PurchaseOder
+                        Purchase Oder Management
                     </Typography>
                 </Stack>
                 <Card>
                     <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} />
 
                     <Scrollbar>
-                        <TableContainer sx={{ minWidth: 800 }}>
+                        <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
                             <Table>
                                 <PurchaseListHead
                                     order={order}

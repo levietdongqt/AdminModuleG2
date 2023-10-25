@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import JoditEditor from 'jodit-react';
 import ImageUploading from 'react-images-uploading';
+import swal from 'sweetalert';
 import {
   Paper,
   Button,
@@ -19,10 +20,11 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useToast } from '@chakra-ui/react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import UpdateSchemaMap from '../../../validations/UpdateValidation';
-import { UpdateTemplate } from '../../../api/TemplateService';
+import { UpdateTemplate,DeleteImageAllById,DeleteImageById } from '../../../api/TemplateService';
 
 const CustomDialogContent = styled(DialogContent)({
   display: 'flex',
@@ -47,9 +49,19 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
   const toast = useToast();
   const [fileList, setFileList] = useState([]);
   const [images, setImages] = useState([]);
+  const [restoreImages,setRestoreImages] = useState([]);
   const editor = useRef(null);
+  const [edited,setEdited] = useState(false);
 
   const [maxNumber, setMaxNumber] = useState(15);
+  
+  const errorPopup = (mess ) => {
+    swal({
+      title: "Warning",
+      text: mess,
+      icon: "warning",
+    })
+  }
 
   const {
     handleChange,
@@ -72,6 +84,11 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
     },
     validationSchema: UpdateSchemaMap,
     onSubmit: async (values) => {
+      if(restoreImages && restoreImages.length>0){
+        const deletedIds = restoreImages.map((image) => image.id);
+        const resDeleted = await DeleteImageAllById(deletedIds);
+        console.log(resDeleted);
+      }
       const formData = new FormData();
       formData.append('Name', values.name);
       formData.append('PricePlusPerOne', values.pricePlusPerOne);
@@ -85,6 +102,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
         formData.append(`formFileList`, item.file);
       });
       const response = await UpdateTemplate(template.id, formData);
+      console.log(response);
       if (response.data.status === 200) {
         toast({
           title: 'Update',
@@ -93,6 +111,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
           duration: 2000,
           isClosable: true,
         });
+        setEdited(true);
       } else {
         toast({
           title: 'Error!',
@@ -104,17 +123,22 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
       }
     },
   });
-
+  
   useEffect(() => {
+    setEdited(false);
     setValues({
       name: template.name,
       pricePlusPerOne: template.pricePlusPerOne,
       descriptionArray: template.descriptionTemplates,
     });
     setTouched({});
+    updateImages();
     if (!openDialog) {
       setImages([]);
       setFileList([]);
+      console.log(restoreImages);
+      setRestoreImages([]);
+      
     }
   }, [template, openDialog]);
 
@@ -135,10 +159,26 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
       reader.readAsDataURL(file); // Đọc tệp ảnh dưới dạng base64
     }
   };
-  const onChange = (imageList) => {
+  const onChange = (imageList,index) => {
     console.log(imageList);
     setImages(imageList);
+    console.log(images);
   };
+
+  const updateImages = () =>{
+    
+    if(template.templateImages && template.templateImages.length > 0){
+      template.templateImages.forEach((image)=>{
+        const img = {
+          id: image.id,
+          data_url: `${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`,
+        }
+        setImages(prev => [...prev,img]);
+      })
+    }
+    console.log(images);
+  }
+  
   return (
     <Dialog
       open={openDialog}
@@ -225,27 +265,7 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
             <Typography variant="body1" color={'GrayText'} style={{ margin: 5 }}>
               <strong>Image:</strong>
             </Typography>
-            {template.templateImages && template.templateImages.length > 0 && (
-              <Grid container spacing={2}>
-                {template.templateImages.map((image, index) => (
-                  <Grid item key={index} xs={12} sm={6} md={6} lg={6}>
-                    {/* ... các component khác */}
-                    <Paper elevation={3}>
-                      <Box
-                        component="img"
-                        sx={
-                          {
-                            // ... các style khác
-                          }
-                        }
-                        alt={`Image ${index}`}
-                        src={`${process.env.REACT_APP_API_BASE_IMAGE}${image.imageUrl}`}
-                      />
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
+            
             {/* <Button
               component="label"
               variant="contained"
@@ -312,54 +332,51 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
               }) => (
                 // write your building UI
                 <div className="upload__image-wrapper">
+                  <Tooltip title="Upload">
                   <Button
                     component="label"
-                    variant="contained"
                     startIcon={<CloudUploadIcon />}
                     color="primary"
-                    sx={{
-                      // Tùy chỉnh CSS cho nút
-                      backgroundColor: 'dark', // Thay đổi màu nền theo ý muốn
-                      color: 'white', // Thay đổi màu chữ theo ý muốn
-                      borderRadius: '4px', // Bo tròn góc
-                      '&:hover': {
-                        backgroundColor: '#e64a19', // Màu nền khi di chuột qua
-                      },
-                    }}
                   >
                     Upload file
                     <VisuallyHiddenInput
                       type="file"
                       accept="image/*"
-                      style={{ display: 'none' }}
                       onClick={onImageUpload}
                       {...dragProps}
                     />
                   </Button>
+                  </Tooltip>
+                  <Tooltip title="Delete All">
+                      <Button
+                        size="100px"
+                        startIcon={<DeleteForeverIcon />}
+                        color="error"
+                        onClick={ async () => {
+                          const imagesHsId = imageList.filter((img) => img.id !== undefined);
+                          // const deletedIds = imagesHsId.map((item) => item.id);
+                          setRestoreImages(imagesHsId);
+                          onImageRemoveAll()}}
+                        {...dragProps}
+                      >
+                        Delete All
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Restore">
                   <Button
-                    component="label2"
-                    variant="contained"
+                    size="100px"
                     startIcon={<CloudUploadIcon />}
                     color="primary"
-                    sx={{
-                      // Tùy chỉnh CSS cho nút
-                      backgroundColor: 'red', // Thay đổi màu nền theo ý muốn
-                      color: 'white', // Thay đổi màu chữ theo ý muốn
-                      borderRadius: '4px', // Bo tròn góc
-                      '&:hover': {
-                        backgroundColor: '#e64a19', // Màu nền khi di chuột qua
-                      },
-                    }}
+                    onClick={ async () => {
+                      setImages(prev => [...prev,...restoreImages]);
+                      setRestoreImages([]);
+                      }}
+                    {...dragProps}
+                   
                   >
-                    Delete All
-                    <VisuallyHiddenInput
-                      type="file"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onClick={onImageRemoveAll}
-                      {...dragProps}
-                    />
+                    Restore
                   </Button>
+                  </Tooltip>
                   <Grid container spacing={2}>
                     {imageList.map((image, index) => {
                       return (
@@ -367,8 +384,8 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                           <Box
                             component="img"
                             sx={{
-                              height: 100,
-                              width: 200,
+                              height: 200,
+                              width: 300,
                               maxHeight: { xs: 233, md: 167 },
                               maxWidth: { xs: 350, md: 250 },
                               border: '0.5px thin #000', // Thêm khung đen 2px
@@ -382,30 +399,40 @@ export default function EditTemplate({ openDialog, handleCloseDialog, template }
                             alt={`Image ${index}`}
                             src={image.data_url}
                           />
-                          <div className="image-item__btn-wrapper">
+                          <Box sx={{display:"flex",justifyContent:"center"}}>
                             <Tooltip title="Change">
-                              <IconButton onClick={(event) => onImageUpdate(index)}>
+                              <IconButton onClick={ async (event) => {
+                                if(image.id !== undefined){
+                                  setRestoreImages(prev => [...prev,image]);
+                                }                              
+                                onImageUpdate(index)}
+                              }>
                                 <PublishedWithChangesIcon sx={{ fontSize: 20 }} />
                               </IconButton>
                             </Tooltip>
                             <Tooltip title="Remove">
-                              <IconButton onClick={(event) => onImageRemove(index)}>
+                              <IconButton onClick={ async (event) => {
+                                if(image.id !== undefined){
+                                  setRestoreImages(prev => [...prev,image]);
+                                }   
+                                onImageRemove(index)}
+                              }>
                                 <DeleteIcon sx={{ fontSize: 20 }} color="error" />
                               </IconButton>
                             </Tooltip>
-                          </div>
+                            </Box>
                         </Grid>
                       );
                     })}
                   </Grid>
                   {errors && (
-                    <div>
-                      {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
-                      {errors.acceptType && <span>Your selected file type is not allow</span>}
-                      {errors.maxFileSize && <span>Selected file size exceed maxFileSize</span>}
-                      {errors.resolution && <span>Selected file is not match your desired resolution</span>}
-                    </div>
-                  )}
+                      <div>
+                        {errors.maxNumber && errorPopup("Number of selected images exceed maxNumber")}
+                        {errors.acceptType &&  errorPopup("Your selected file type is not allow")}
+                        {errors.maxFileSize && errorPopup("Selected file size exceed maxFileSize")}
+                        {errors.resolution && errorPopup("Selected file is not match your desired resolution")}
+                      </div>
+                    )}
                 </div>
               )}
             </ImageUploading>
