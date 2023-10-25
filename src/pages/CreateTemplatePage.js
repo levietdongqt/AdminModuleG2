@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImageUploading from 'react-images-uploading';
+import { useCookies } from 'react-cookie';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -65,10 +66,10 @@ export default function CreateTemplatePage() {
   const [maxNumber, setMaxNumber] = useState(15);
   const [open, setOpen] = useState({});
   const [collectionsSelectedItems, setCollectionsSelectedItems] = useState([]);
-
+  const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['accessToken']);
   const editor = useRef(null);
 
-  useEffect(() => {}, [collectionsSelectedItems, fileList]);
+  useEffect(() => {console.log(tokenCookie)}, [collectionsSelectedItems, fileList]);
 
   const formik = useFormik({
     initialValues: {

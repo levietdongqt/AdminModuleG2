@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment,Box } from '@mui/material';
+import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment } from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
 
@@ -32,16 +32,13 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-UserListToolbar.propTypes = {
+PurchaseListToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
-  onDisableClick: PropTypes.func,
-  onActiveClick:PropTypes.func,
-  onSpendingClick:PropTypes.func,
 };
 
-export default function UserListToolbar({ numSelected, filterName, onFilterName,onDisableClick,onActiveClick,onSpendingClick }) {
+export default function PurchaseListToolbar({ numSelected, filterName, onFilterName }) {
   return (
     <StyledRoot
       sx={{
@@ -67,25 +64,6 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName,
           }
         />
       )}
-
-      
-      <Box>
-        <Tooltip title="Disable">
-          <IconButton size="large" color="inherit" onClick={() => onDisableClick("Disabled")}>
-            <Iconify icon="zondicons:block" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Active">
-          <IconButton size="large" color="inherit" onClick={() => onActiveClick("Enabled")}>
-            <Iconify icon="ooui:user-active" />
-          </IconButton>
-        </Tooltip> 
-        <Tooltip title="Spending">
-          <IconButton size="large" color="inherit" onClick={() => onSpendingClick("Pending")}>
-            <Iconify icon="mdi:account-pending-outline" />
-          </IconButton>
-        </Tooltip>
-        </Box> 
     </StyledRoot>
   );
 }

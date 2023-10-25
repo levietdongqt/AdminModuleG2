@@ -3,13 +3,13 @@ import { format, getTime, formatDistanceToNow } from 'date-fns';
 // ----------------------------------------------------------------------
 
 export function fDate(date, newFormat) {
-  const fm = newFormat || 'dd MMM yyyy';
+  const fm = newFormat || 'yyyy - MM - dd';
 
   return date ? format(new Date(date), fm) : '';
 }
 
 export function fDateTime(date, newFormat) {
-  const fm = newFormat || 'dd MMM yyyy p';
+  const fm = newFormat || 'yyyy-MM-dd p';
 
   return date ? format(new Date(date), fm) : '';
 }

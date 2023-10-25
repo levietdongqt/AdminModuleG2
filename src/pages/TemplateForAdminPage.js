@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { filter, set, template } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -109,6 +109,7 @@ export default function TemplateForAdminPage() {
   const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
   const [openDialogConfirmAll, setOpenDialogConfirmAll] = useState(false);
   const [openDialogSize, setOpenDialogSize] = useState(false);
+  const [option,setOption]=useState("Banned");
 
   const [page, setPage] = useState(0);
 
@@ -136,6 +137,7 @@ export default function TemplateForAdminPage() {
   const [isAscending, setIsAscending] = useState(false);
   const [idSelected, setIdSelected] = useState(null);
   const [count, setCount] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     GetAllTemplateAsync(1, dataPerPage, filterOn, filterQuery, orderBy, isAscending, status);
@@ -265,9 +267,11 @@ export default function TemplateForAdminPage() {
     if (status) {
       setStatus(false);
       setCheckStatus(false);
+      setOption("Active");
     } else {
       setStatus(true);
       setCheckStatus(true);
+      setOption("Banned");
     }
   };
 
@@ -297,7 +301,7 @@ export default function TemplateForAdminPage() {
           <Typography variant="h4" gutterBottom color={'Highlight'} sx={{letterSpacing:"0.05em"}}>
           Template Management
           </Typography>
-          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} href="/template/create" color="secondary" sx={{letterSpacing:"0.05em"}}>
+          <Button variant="outlined" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => navigate("/template/create")} color="secondary" sx={{letterSpacing:"0.05em"}}>
             NEW TEMPLATE
           </Button>
         </Stack>
@@ -377,7 +381,7 @@ export default function TemplateForAdminPage() {
                         </TableCell>
 
                         <TableCell align="left">
-                          <Label color={(row.status === 'banned' && 'error') || 'success'}>
+                          <Label color={(row.status === false && 'error') || 'success'}>
                             {sentenceCase(row.status === true ? 'active' : 'banned')}
                           </Label>
                         </TableCell>
@@ -495,9 +499,9 @@ export default function TemplateForAdminPage() {
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 1 }} />
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 1 }} />
           <Button variant="outlined" onClick={() => handleDelete(idSelected)}>
-            Delete
+            {option}
           </Button>
         </MenuItem>
       </Popover>
