@@ -38,7 +38,7 @@ import {
   ShowReviews,
   ShowFeedBack,
   PurchaseListHead,
-  UserListToolbar,
+  PurchaseListToolbar,
   PurchaseDeliveryInfo,
 } from '../sections/@dashboard/user';
 
@@ -257,14 +257,18 @@ export default function PurchaseOderPage() {
                 <title> Purchase Oder </title>
             </Helmet>
 
-            <Container>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h4" gutterBottom color={'Highlight'}>
-                        Purchase Oder Management
-                    </Typography>
-                </Stack>
-                <Card>
-                    <UserListToolbar numSelected={selected.length} filterName={search} onFilterName={handleFilterByEmailOrPhone} />
+      <Container>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          <Typography variant="h4" gutterBottom color={'Highlight'}>
+            PurchaseOder
+          </Typography>
+        </Stack>
+        <Card>
+          <PurchaseListToolbar
+            numSelected={selected.length}
+            filterName={search}
+            onFilterName={handleFilterByEmailOrPhone}
+          />
 
                     <Scrollbar>
                         <TableContainer sx={{ minWidth: 800,letterSpacing:"0.05em" }}>
