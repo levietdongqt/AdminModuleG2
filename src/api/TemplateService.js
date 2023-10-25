@@ -34,7 +34,7 @@ export async function GetAllCategories(){
 
 export async function GetAllSizes(){
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/Size`);
+        const response = await baseRequest.get(`${process.env.REACT_APP_API_BASE_URL}/Size`);
         return response;
     }catch(error){
         return AxiosError.ERR_BAD_REQUEST;

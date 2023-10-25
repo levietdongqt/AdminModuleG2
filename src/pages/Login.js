@@ -15,15 +15,17 @@ import { Login as LogIn } from '../api/AuthServices';
 const Login = () => {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(false);
-  const { setCurrentUser, setToken } = useUserContext();
+  const {  currentUser,
+    setToken } = useUserContext();
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
-  const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['accessToken']);
+  const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['access_token']);
   const navigate = useNavigate();
   const toast = useToast();
   const handldeResponse = (result, remember) => {
     if (result.data.status === 200 && result.data.role === 'admin') {
       setCurrentUser(result.data.result);
       setToken(result.data.token);
+      console.log(result.data.token);
       toast({
         title: 'Logged in.',
         description: 'You have successfully logged in.',
@@ -31,13 +33,14 @@ const Login = () => {
         duration: 2000,
         isClosable: true
       });
-      navigate('app');
+      navigate('/app');
       if (remember && result.data.role === 'admin') {
-        setCookie('currentUser', result.data.result, { path: '/app' });
-        setTokenCookie('accessToken', result.data.token, { path: '/app' })
-      } else {
-        setCookie('currentUser', result.data.result, { path: '/app',expires:0 });
-        setTokenCookie('accessToken',result.data.token,{ path: '/app',expires:0 })
+        setCookie('currentUser', result.data.result, { path: '/' });
+        setTokenCookie('access_token', result.data.token, { path: '/' })
+        console.log(tokenCookie);
+      } else if(result.data.role === 'admin' ) {
+        setCookie('currentUser', result.data.result, { path: '/',expires:0});
+        setTokenCookie('access_token',result.data.token,{ path: '/',expires:0 })
       };
     } else {
       resetForm();

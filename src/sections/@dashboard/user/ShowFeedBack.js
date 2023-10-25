@@ -28,6 +28,9 @@ import JoditEditor from 'jodit-react';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import StarRateIcon from '@mui/icons-material/StarRate';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -165,7 +168,7 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
         style: {
           backgroundColor: '#F5F7F8', // thay đổi màu nền theo ý muốn của bạn
           width: 1200, // thay đổi độ rộng cố định theo ý muốn của bạn
-          height: 600, // thay đổi chiều dài cố định theo ý muốn của bạn
+          height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
           letterSpacing: '0.05em',
         },
@@ -182,7 +185,7 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                 <Button
                   component="label"
                   variant="outlined"
-                  startIcon={<CloudUploadIcon />}
+                  startIcon={<SelectAllIcon />}
                   color="inherit"
                   sx={
                     {
@@ -193,7 +196,7 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
                 >
                   All Feedback
                 </Button>
-                <Button variant="outlined" onClick={handleShowImportant}>
+                <Button variant="outlined" startIcon={<StarRateIcon/>} color="inherit" onClick={handleShowImportant}>
                   Show Important
                 </Button>
                 <Table>
@@ -346,7 +349,20 @@ export default function ShowFeedBack({ openDialog, handleCloseDialog, user }) {
         </Container>
       </CustomDialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Close</Button>
+      <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="inherit"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
       </DialogActions>
     </Dialog>
   );

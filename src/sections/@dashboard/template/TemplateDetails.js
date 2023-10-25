@@ -12,7 +12,9 @@ import {
   DialogActions,
   styled,
 } from '@mui/material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { fDateTime } from '../../../utils/formatTime';
+
 
 const CustomDialogContent = styled(DialogContent)({
   display: 'flex',
@@ -136,7 +138,20 @@ export default function TemplateDetails({ openDialog, handleCloseDialog, templat
             </div>    
         </CustomDialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
+              <Button
+                component="label"
+                variant="outlined"
+                startIcon={<ExitToAppIcon />}
+                color="success"
+                sx={
+                  {
+                    letterSpacing: '0.05em'
+                  }
+                }
+                onClick={handleCloseDialog}
+              >
+                Close
+              </Button>
         </DialogActions>
       </Dialog>
   );

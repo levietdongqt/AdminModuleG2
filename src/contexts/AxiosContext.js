@@ -8,8 +8,7 @@ const  GetToken = () => {
     acc[name] = value;
     return acc;
   }, {});
-  const accessToken = cookies.access_token;
-  console.log(accessToken)
+  const accessToken = cookies.accessToken;
   return accessToken;
 }
 const baseRequest = axios.create({
@@ -18,6 +17,7 @@ const baseRequest = axios.create({
 });
 baseRequest.interceptors.request.use((config) =>{
   const token = GetToken();
+  console.log(token);
   if(token) {
       config.headers.Authorization = `Bearer ${token}`;
   }
