@@ -16,7 +16,7 @@ const Login = () => {
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(false);
   const {  currentUser,
-    setToken } = useUserContext();
+    setToken ,setCurrentUser} = useUserContext();
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
   const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['access_token']);
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ const Login = () => {
     onSubmit: values => {
       LogIn(values.email, values.password)
         .then((result) => {
-          handldeResponse(result, remember);
+          handldeResponse(result, true);
         });
     },
     validationSchema: LoginValidations
